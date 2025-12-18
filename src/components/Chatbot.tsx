@@ -59,87 +59,89 @@ export function Chatbot() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-[100] flex flex-col items-end">
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8, y: 20, transformOrigin: "bottom right" }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.8, y: 20 }}
-            className="mb-4 w-[350px] sm:w-[400px]"
-          >
-            <Card className="border-none shadow-2xl overflow-hidden bg-white dark:bg-neutral-900 rounded-[2rem]">
-              <CardHeader className="bg-gradient-to-r from-red-600 to-red-800 p-6 flex flex-row items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
-                    <Sparkles className="text-white w-6 h-6" />
-                  </div>
-                  <div>
-                    <h3 className="text-white font-bold text-lg">Travel Assistant</h3>
-                    <div className="flex items-center gap-1.5">
-                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                      <span className="text-white/80 text-xs">Online</span>
+    <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[100] flex flex-col items-end">
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, y: 20, transformOrigin: "bottom right" }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.8, y: 20 }}
+              className="mb-4 w-[calc(100vw-2rem)] sm:w-[400px] max-w-[400px]"
+            >
+<Card className="border-none shadow-2xl overflow-hidden bg-white dark:bg-neutral-900 rounded-[2rem] flex flex-col max-h-[calc(100vh-8rem)] gap-0 py-0">
+                  <CardHeader className="bg-gradient-to-r from-red-600 to-red-800 p-6 flex flex-row items-center justify-between shrink-0">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                        <Sparkles className="text-white w-6 h-6" />
+                      </div>
+                      <div>
+                        <h3 className="text-white font-bold text-lg">Travel Assistant</h3>
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                          <span className="text-white/80 text-xs">Online</span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setIsOpen(false)}
-                  className="text-white hover:bg-white/10 rounded-full"
-                >
-                  <X className="w-5 h-5" />
-                </Button>
-              </CardHeader>
-              
-              <CardContent 
-                ref={scrollRef}
-                className="h-[400px] overflow-y-auto p-6 space-y-4 scroll-smooth"
-              >
-                {messages.map((msg) => (
-                  <motion.div
-                    key={msg.id}
-                    initial={{ opacity: 0, x: msg.sender === "user" ? 10 : -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
-                  >
-                    <div
-                      className={`max-w-[80%] p-4 rounded-2xl text-sm ${
-                        msg.sender === "user"
-                          ? "bg-red-600 text-white rounded-tr-none"
-                          : "bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 rounded-tl-none"
-                      }`}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setIsOpen(false)}
+                      className="text-white hover:bg-white/10 rounded-full"
                     >
-                      {msg.text}
-                    </div>
-                  </motion.div>
-                ))}
-              </CardContent>
-
-              <CardFooter className="p-4 bg-neutral-50 dark:bg-neutral-800/50 border-t border-neutral-100 dark:border-neutral-800">
-                <form 
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleSend();
-                  }}
-                  className="flex w-full gap-2"
-                >
-                  <Input
-                    placeholder="Type your message..."
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    className="flex-1 bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-700 rounded-xl focus-visible:ring-red-600"
-                  />
-                  <Button 
-                    type="submit" 
-                    size="icon" 
-                    className="bg-red-600 hover:bg-red-700 text-white rounded-xl shrink-0"
+                      <X className="w-5 h-5" />
+                    </Button>
+                  </CardHeader>
+                
+                  <CardContent 
+                    ref={scrollRef}
+                    className="flex-1 min-h-[250px] overflow-y-auto p-0"
                   >
-                    <Send className="w-4 h-4" />
-                  </Button>
-                </form>
-              </CardFooter>
-            </Card>
+                    <div className="p-6 space-y-4">
+                      {messages.map((msg) => (
+                        <motion.div
+                          key={msg.id}
+                          initial={{ opacity: 0, x: msg.sender === "user" ? 10 : -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
+                        >
+                          <div
+                            className={`max-w-[80%] p-4 rounded-2xl text-sm ${
+                              msg.sender === "user"
+                                ? "bg-red-600 text-white rounded-tr-none"
+                                : "bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 rounded-tl-none"
+                            }`}
+                          >
+                            {msg.text}
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </CardContent>
+
+                  <CardFooter className="p-4 bg-neutral-50 dark:bg-neutral-800/50 border-t border-neutral-100 dark:border-neutral-800 shrink-0">
+                    <form 
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        handleSend();
+                      }}
+                      className="flex w-full gap-2"
+                    >
+                      <Input
+                        placeholder="Type your message..."
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        className="flex-1 bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-700 rounded-full focus-visible:ring-red-600"
+                      />
+                      <Button 
+                        type="submit" 
+                        size="icon" 
+                        className="bg-red-600 hover:bg-red-700 text-white rounded-full shrink-0"
+                      >
+                        <Send className="w-4 h-4" />
+                      </Button>
+                    </form>
+                  </CardFooter>
+                </Card>
           </motion.div>
         )}
       </AnimatePresence>

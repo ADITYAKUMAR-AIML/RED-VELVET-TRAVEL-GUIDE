@@ -3,7 +3,7 @@
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Star, MapPin, Wifi, Coffee, Utensils, Waves, Search } from "lucide-react";
+import { Star, MapPin, Wifi, Coffee, Utensils, Waves, Search, ChevronRight, Heart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { Navbar } from "@/components/Navbar";
@@ -22,93 +22,290 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
-const ITEMS_PER_PAGE = 2;
+const ITEMS_PER_PAGE = 8;
 const RED_VELVET_GRADIENT = "bg-gradient-to-r from-[#8a0000] via-[#c00000] to-[#8a0000]";
 
-const HOTELS = [
-  {
-    id: 1,
-    name: "The Velvet Oasis",
-    location: "Santorini, Greece",
-    price: "$450",
-    rating: 5,
-    type: "Resort",
-    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=800&auto=format&fit=crop",
-    amenities: ["Free Wifi", "Breakfast", "Pool", "Spa"]
-  },
-  {
-    id: 2,
-    name: "Imperial Gardens",
-    location: "Kyoto, Japan",
-    price: "$380",
-    rating: 5,
-    type: "Boutique",
-    image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=800&auto=format&fit=crop",
-    amenities: ["Free Wifi", "Breakfast", "Zen Garden", "Tea Room"]
-  },
-  {
-    id: 3,
-    name: "Alpine Majesty Resort",
-    location: "Zermatt, Switzerland",
-    price: "$550",
-    rating: 5,
-    type: "Resort",
-    image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=800&auto=format&fit=crop",
-    amenities: ["Ski-in/Ski-out", "Spa", "Gourmet Dining", "Fireplace"]
-  },
-  {
-    id: 4,
-    name: "Azure Lagoon Retreat",
-    location: "Bora Bora",
-    price: "$890",
-    rating: 5,
-    type: "Luxury",
-    image: "https://images.unsplash.com/photo-1439130490301-25e322d88054?q=80&w=800&auto=format&fit=crop",
-    amenities: ["Overwater Villa", "Private Beach", "Butler Service", "Diving"]
-  },
-  {
-    id: 5,
-    name: "The Grand Velvet",
-    location: "Paris, France",
-    price: "$620",
-    rating: 5,
-    type: "Boutique",
-    image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=800&auto=format&fit=crop",
-    amenities: ["Spa", "Michelin Restaurant", "Concierge", "City View"]
-  }
+const INDIAN_STATES = [
+  { id: "rajasthan", name: "Rajasthan", icon: "🏰" },
+  { id: "kerala", name: "Kerala", icon: "🌴" },
+  { id: "goa", name: "Goa", icon: "🏖️" },
+  { id: "maharashtra", name: "Maharashtra", icon: "🏛️" },
+  { id: "karnataka", name: "Karnataka", icon: "🛕" },
 ];
+
+const HOTELS_BY_STATE: Record<string, typeof HOTELS> = {
+  rajasthan: [
+    {
+      id: 101,
+      name: "Taj Lake Palace",
+      location: "Udaipur, Rajasthan",
+      price: "₹45,000",
+      rating: 5,
+      type: "Heritage",
+      state: "rajasthan",
+      image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=800&auto=format&fit=crop",
+      amenities: ["Lake View", "Spa", "Heritage Tours", "Fine Dining"]
+    },
+    {
+      id: 102,
+      name: "Umaid Bhawan Palace",
+      location: "Jodhpur, Rajasthan",
+      price: "₹52,000",
+      rating: 5,
+      type: "Palace",
+      state: "rajasthan",
+      image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=800&auto=format&fit=crop",
+      amenities: ["Royal Spa", "Pool", "Museum", "Butler Service"]
+    },
+    {
+      id: 103,
+      name: "Rambagh Palace",
+      location: "Jaipur, Rajasthan",
+      price: "₹38,000",
+      rating: 5,
+      type: "Heritage",
+      state: "rajasthan",
+      image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=800&auto=format&fit=crop",
+      amenities: ["Peacock Garden", "Spa", "Polo Grounds", "Heritage Walk"]
+    },
+    {
+      id: 104,
+      name: "Suryagarh Jaisalmer",
+      location: "Jaisalmer, Rajasthan",
+      price: "₹28,000",
+      rating: 5,
+      type: "Resort",
+      state: "rajasthan",
+      image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=800&auto=format&fit=crop",
+      amenities: ["Desert Safari", "Pool", "Spa", "Cultural Shows"]
+    },
+  ],
+  kerala: [
+    {
+      id: 201,
+      name: "Kumarakom Lake Resort",
+      location: "Kumarakom, Kerala",
+      price: "₹32,000",
+      rating: 5,
+      type: "Resort",
+      state: "kerala",
+      image: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?q=80&w=800&auto=format&fit=crop",
+      amenities: ["Backwater View", "Ayurveda Spa", "Houseboat", "Yoga"]
+    },
+    {
+      id: 202,
+      name: "Taj Bekal Resort & Spa",
+      location: "Bekal, Kerala",
+      price: "₹28,000",
+      rating: 5,
+      type: "Resort",
+      state: "kerala",
+      image: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?q=80&w=800&auto=format&fit=crop",
+      amenities: ["Private Pool", "Ayurveda", "Beach Access", "Spa"]
+    },
+    {
+      id: 203,
+      name: "Spice Village Thekkady",
+      location: "Thekkady, Kerala",
+      price: "₹18,000",
+      rating: 4,
+      type: "Eco Resort",
+      state: "kerala",
+      image: "https://images.unsplash.com/photo-1596176530529-78163a4f7af2?q=80&w=800&auto=format&fit=crop",
+      amenities: ["Spice Garden", "Wildlife Safari", "Pool", "Cooking Class"]
+    },
+    {
+      id: 204,
+      name: "Coconut Lagoon",
+      location: "Kumarakom, Kerala",
+      price: "₹22,000",
+      rating: 5,
+      type: "Heritage",
+      state: "kerala",
+      image: "https://images.unsplash.com/photo-1439130490301-25e322d88054?q=80&w=800&auto=format&fit=crop",
+      amenities: ["Houseboat", "Backwaters", "Ayurveda", "Bird Watching"]
+    },
+  ],
+  goa: [
+    {
+      id: 301,
+      name: "Taj Exotica Resort & Spa",
+      location: "South Goa",
+      price: "₹25,000",
+      rating: 5,
+      type: "Beach Resort",
+      state: "goa",
+      image: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?q=80&w=800&auto=format&fit=crop",
+      amenities: ["Private Beach", "Spa", "Golf Course", "Pool"]
+    },
+    {
+      id: 302,
+      name: "W Goa",
+      location: "North Goa",
+      price: "₹22,000",
+      rating: 5,
+      type: "Luxury",
+      state: "goa",
+      image: "https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=800&auto=format&fit=crop",
+      amenities: ["Beach Access", "Infinity Pool", "Nightclub", "Spa"]
+    },
+    {
+      id: 303,
+      name: "The Leela Goa",
+      location: "South Goa",
+      price: "₹20,000",
+      rating: 5,
+      type: "Resort",
+      state: "goa",
+      image: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=800&auto=format&fit=crop",
+      amenities: ["Lagoon View", "Golf", "Spa", "Multiple Restaurants"]
+    },
+    {
+      id: 304,
+      name: "Alila Diwa Goa",
+      location: "South Goa",
+      price: "₹18,000",
+      rating: 5,
+      type: "Boutique",
+      state: "goa",
+      image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=800&auto=format&fit=crop",
+      amenities: ["Paddy Field View", "Infinity Pool", "Spa", "Yoga"]
+    },
+  ],
+  maharashtra: [
+    {
+      id: 401,
+      name: "Taj Mahal Palace",
+      location: "Mumbai, Maharashtra",
+      price: "₹35,000",
+      rating: 5,
+      type: "Heritage",
+      state: "maharashtra",
+      image: "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?q=80&w=800&auto=format&fit=crop",
+      amenities: ["Sea View", "Heritage Tours", "Spa", "Fine Dining"]
+    },
+    {
+      id: 402,
+      name: "The Oberoi Mumbai",
+      location: "Mumbai, Maharashtra",
+      price: "₹28,000",
+      rating: 5,
+      type: "Luxury",
+      state: "maharashtra",
+      image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=800&auto=format&fit=crop",
+      amenities: ["Ocean View", "Spa", "Rooftop Pool", "Business Center"]
+    },
+    {
+      id: 403,
+      name: "Della Resorts",
+      location: "Lonavala, Maharashtra",
+      price: "₹15,000",
+      rating: 4,
+      type: "Adventure Resort",
+      state: "maharashtra",
+      image: "https://images.unsplash.com/photo-1596436889106-be35e843f974?q=80&w=800&auto=format&fit=crop",
+      amenities: ["Adventure Park", "Spa", "Pool", "Camp Fire"]
+    },
+    {
+      id: 404,
+      name: "Radisson Blu Pune",
+      location: "Pune, Maharashtra",
+      price: "₹12,000",
+      rating: 4,
+      type: "Business",
+      state: "maharashtra",
+      image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=800&auto=format&fit=crop",
+      amenities: ["Pool", "Gym", "Spa", "Business Lounge"]
+    },
+  ],
+  karnataka: [
+    {
+      id: 501,
+      name: "Taj West End",
+      location: "Bengaluru, Karnataka",
+      price: "₹18,000",
+      rating: 5,
+      type: "Heritage",
+      state: "karnataka",
+      image: "https://images.unsplash.com/photo-1596176530529-78163a4f7af2?q=80&w=800&auto=format&fit=crop",
+      amenities: ["Garden View", "Spa", "Pool", "Heritage Walk"]
+    },
+    {
+      id: 502,
+      name: "Evolve Back Coorg",
+      location: "Coorg, Karnataka",
+      price: "₹42,000",
+      rating: 5,
+      type: "Luxury Resort",
+      state: "karnataka",
+      image: "https://images.unsplash.com/photo-1600100397608-e0c91c249fdd?q=80&w=800&auto=format&fit=crop",
+      amenities: ["Private Pool", "Coffee Plantation", "Spa", "Wildlife"]
+    },
+    {
+      id: 503,
+      name: "JW Marriott Bengaluru",
+      location: "Bengaluru, Karnataka",
+      price: "₹15,000",
+      rating: 5,
+      type: "Business",
+      state: "karnataka",
+      image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=800&auto=format&fit=crop",
+      amenities: ["Rooftop Pool", "Spa", "Fine Dining", "Gym"]
+    },
+    {
+      id: 504,
+      name: "Orange County Kabini",
+      location: "Kabini, Karnataka",
+      price: "₹35,000",
+      rating: 5,
+      type: "Wildlife Resort",
+      state: "karnataka",
+      image: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?q=80&w=800&auto=format&fit=crop",
+      amenities: ["Safari", "Pool", "Spa", "Nature Walks"]
+    },
+  ],
+};
+
+const HOTELS = Object.values(HOTELS_BY_STATE).flat();
 
 export default function HotelsPage() {
   const { t } = useLanguage();
-    const [mounted, setMounted] = React.useState(false);
-    const [searchQuery, setSearchQuery] = React.useState("");
-    const [activeType, setActiveType] = React.useState("All");
-    const [currentPage, setCurrentPage] = React.useState(1);
-  
-    React.useEffect(() => {
-      setMounted(true);
-    }, []);
+  const [mounted, setMounted] = React.useState(false);
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [currentPage, setCurrentPage] = React.useState(1);
 
-    React.useEffect(() => {
-      setCurrentPage(1);
-    }, [searchQuery, activeType]);
-  
-    const filteredHotels = HOTELS.filter(hotel => {
-      const matchesSearch = hotel.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                           hotel.location.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesType = activeType === "All" || hotel.type === activeType;
-      return matchesSearch && matchesType;
-    });
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
-    const totalPages = Math.ceil(filteredHotels.length / ITEMS_PER_PAGE);
-    const paginatedHotels = filteredHotels.slice(
-      (currentPage - 1) * ITEMS_PER_PAGE,
-      currentPage * ITEMS_PER_PAGE
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  const filteredHotels = React.useMemo(() => {
+    if (!searchQuery) return HOTELS;
+    return HOTELS.filter(hotel => 
+      hotel.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      hotel.location.toLowerCase().includes(searchQuery.toLowerCase())
     );
+  }, [searchQuery]);
+
+  const totalPages = Math.ceil(filteredHotels.length / ITEMS_PER_PAGE);
+  const paginatedHotels = filteredHotels.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const getFilteredHotels = (stateId: string) => {
+    const stateHotels = HOTELS_BY_STATE[stateId] || [];
+    if (!searchQuery) return stateHotels;
+    return stateHotels.filter(hotel => 
+      hotel.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      hotel.location.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  };
 
   if (!mounted) return null;
-
-  const hotelTypes = ["All", "Resort", "Boutique", "Luxury"];
 
   return (
     <div className="flex min-h-screen flex-col bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50 transition-colors duration-300">
@@ -117,14 +314,15 @@ export default function HotelsPage() {
       <main className="flex-1 pt-32 pb-24">
         <div className="container mx-auto px-6">
           <div className="mb-12">
+            <Badge className="mb-4 bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-400 border-none">Explore India</Badge>
             <h1 className="mb-4 text-4xl font-bold md:text-5xl">{t('luxuryStays')}</h1>
             <p className="max-w-2xl text-neutral-600 dark:text-neutral-400">
               {t('luxuryStaysDesc')}
             </p>
           </div>
 
-          <div className="mb-12 flex flex-col gap-6 md:flex-row md:items-center">
-            <div className="relative flex-1">
+          <div className="mb-12">
+            <div className="relative max-w-xl">
               <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400 dark:text-neutral-500" />
               <Input 
                 placeholder={t('searchPlaceholder')}
@@ -133,155 +331,126 @@ export default function HotelsPage() {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0">
-              {hotelTypes.map((type) => (
-                <Badge 
-                  key={type}
-                  variant={activeType === type ? "default" : "outline"}
-                  className={`cursor-pointer px-4 py-2 text-sm whitespace-nowrap ${
-                    activeType === type 
-                      ? "bg-red-600 text-white border-red-600" 
-                      : "hover:bg-neutral-100 dark:hover:bg-neutral-800 border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300"
-                  }`}
-                  onClick={() => setActiveType(type)}
-                >
-                  {type === "All" ? t('all') : type}
-                </Badge>
-              ))}
-            </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-2">
-            <AnimatePresence mode="popLayout">
-              {paginatedHotels.map((hotel, idx) => (
-                <motion.div
-                  key={hotel.id}
-                  layout
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <Link href={`/hotels/${hotel.id}`}>
-                    <Card className="group overflow-hidden border-none bg-white dark:bg-neutral-900 shadow-sm transition-all hover:shadow-2xl cursor-pointer">
-                      <div className="flex flex-col md:flex-row">
-                        <div className="relative h-64 w-full md:h-auto md:w-2/5">
-                          <Image 
-                            src={hotel.image} 
-                            alt={hotel.name} 
-                            fill 
-                            className="object-cover transition-transform duration-700 group-hover:scale-110" 
-                          />
-                        </div>
-                        <div className="flex flex-1 flex-col p-8">
-                          <div className="mb-2 flex items-center justify-between">
-                            <div className="flex items-center gap-1">
-                              {[...Array(hotel.rating)].map((_, i) => (
-                                <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                              ))}
-                            </div>
-                            <Badge variant="outline" className="border-red-200 dark:border-red-800 text-red-800 dark:text-red-400">
-                              {t('recommended')}
+{paginatedHotels.length > 0 && (
+              <section className="mb-16">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                  {paginatedHotels.map((hotel, idx) => (
+                    <motion.div
+                      key={hotel.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: idx * 0.05 }}
+                    >
+                      <Link href={`/hotels/${hotel.id}`}>
+                        <Card className="group overflow-hidden border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm transition-all hover:shadow-xl cursor-pointer h-full">
+                          <div className="relative h-48 overflow-hidden">
+                            <Image 
+                              src={hotel.image} 
+                              alt={hotel.name} 
+                              fill 
+                              className="object-cover transition-transform duration-500 group-hover:scale-110" 
+                            />
+                            <button className="absolute top-3 right-3 p-2 bg-white/80 dark:bg-neutral-900/80 rounded-full backdrop-blur-sm hover:bg-white dark:hover:bg-neutral-900 transition-colors">
+                              <Heart className="h-4 w-4 text-neutral-600 dark:text-neutral-400" />
+                            </button>
+                            <Badge className="absolute top-3 left-3 bg-red-600 text-white border-none text-[10px]">
+                              Popular
                             </Badge>
                           </div>
-                          <h3 className="mb-2 text-2xl font-bold text-neutral-900 dark:text-neutral-50">{hotel.name}</h3>
-                          <div className="mb-6 flex items-center gap-1 text-sm text-neutral-500 dark:text-neutral-400">
-                            <MapPin className="h-4 w-4" /> {hotel.location}
-                          </div>
-                          
-                          <div className="mb-8 flex flex-wrap gap-4">
-                            <div className="flex items-center gap-2 text-xs font-medium text-neutral-600 dark:text-neutral-400">
-                              <Wifi className="h-4 w-4 text-red-800 dark:text-red-500" /> Wifi
+                          <CardContent className="p-4">
+                            <div className="flex items-center gap-1 mb-2">
+                              {[...Array(hotel.rating)].map((_, i) => (
+                                <Star key={i} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                              ))}
+                              <span className="text-xs text-neutral-500 dark:text-neutral-400 ml-1">{hotel.rating}.0</span>
                             </div>
-                            <div className="flex items-center gap-2 text-xs font-medium text-neutral-600 dark:text-neutral-400">
-                              <Coffee className="h-4 w-4 text-red-800 dark:text-red-500" /> Breakfast
+                            <h3 className="font-bold text-neutral-900 dark:text-neutral-50 mb-1 line-clamp-1 group-hover:text-red-600 transition-colors">
+                              {hotel.name}
+                            </h3>
+                            <div className="flex items-center gap-1 text-xs text-neutral-500 dark:text-neutral-400 mb-3">
+                              <MapPin className="h-3 w-3" /> {hotel.location}
                             </div>
-                            <div className="flex items-center gap-2 text-xs font-medium text-neutral-600 dark:text-neutral-400">
-                              <Waves className="h-4 w-4 text-red-800 dark:text-red-500" /> Pool
+                            <div className="flex items-center justify-between pt-3 border-t border-neutral-100 dark:border-neutral-800">
+                              <div>
+                                <span className="text-lg font-bold text-red-600 dark:text-red-400">{hotel.price}</span>
+                                <span className="text-xs text-neutral-500 dark:text-neutral-400"> / night</span>
+                              </div>
+                              <Badge variant="outline" className="text-[10px] border-neutral-300 dark:border-neutral-700">
+                                {hotel.type}
+                              </Badge>
                             </div>
-                            <div className="flex items-center gap-2 text-xs font-medium text-neutral-600 dark:text-neutral-400">
-                              <Utensils className="h-4 w-4 text-red-800 dark:text-red-500" /> Dining
-                            </div>
-                          </div>
-
-                          <div className="mt-auto flex items-center justify-between border-t border-neutral-100 dark:border-neutral-800 pt-6">
-                            <div>
-                              <p className="text-sm font-bold text-red-900 dark:text-red-400">{hotel.price}</p>
-                              <p className="text-xs text-neutral-500 dark:text-neutral-400">{t('perNight')}</p>
-                            </div>
-                            <Button className={`${RED_VELVET_GRADIENT} rounded-xl text-white`}>
-                              {t('bookStay')}
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
-                  </Link>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
-
-          {totalPages > 1 && (
-            <div className="mt-16">
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious 
-                      href="#" 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (currentPage > 1) setCurrentPage(currentPage - 1);
-                      }}
-                      className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                    />
-                  </PaginationItem>
-                  {[...Array(totalPages)].map((_, i) => (
-                    <PaginationItem key={i}>
-                      <PaginationLink 
-                        href="#" 
-                        isActive={currentPage === i + 1}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setCurrentPage(i + 1);
-                        }}
-                        className="cursor-pointer"
-                      >
-                        {i + 1}
-                      </PaginationLink>
-                    </PaginationItem>
+                          </CardContent>
+                        </Card>
+                      </Link>
+                    </motion.div>
                   ))}
-                  <PaginationItem>
-                    <PaginationNext 
-                      href="#" 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-                      }}
-                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </div>
-          )}
+                </div>
 
-          {filteredHotels.length === 0 && (
-            <div className="py-24 text-center">
-              <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-neutral-100 dark:bg-neutral-800">
-                <Search className="h-10 w-10 text-neutral-400 dark:text-neutral-500" />
+                {totalPages > 1 && (
+                  <div className="mt-12">
+                    <Pagination>
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious 
+                            href="#"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              if (currentPage > 1) setCurrentPage(currentPage - 1);
+                            }}
+                            className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                          />
+                        </PaginationItem>
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                          <PaginationItem key={page}>
+                            <PaginationLink
+                              href="#"
+                              isActive={currentPage === page}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                setCurrentPage(page);
+                              }}
+                              className="cursor-pointer"
+                            >
+                              {page}
+                            </PaginationLink>
+                          </PaginationItem>
+                        ))}
+                        <PaginationItem>
+                          <PaginationNext 
+                            href="#"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+                            }}
+                            className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  </div>
+                )}
+              </section>
+            )}
+
+{filteredHotels.length === 0 && (
+              <div className="py-24 text-center">
+                <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-neutral-100 dark:bg-neutral-800">
+                  <Search className="h-10 w-10 text-neutral-400 dark:text-neutral-500" />
+                </div>
+                <h3 className="mb-2 text-2xl font-bold text-neutral-900 dark:text-neutral-50">{t('noDestinationsFound')}</h3>
+                <p className="text-neutral-500 dark:text-neutral-400">{t('noDestinationsFoundDesc')}</p>
+                <Button 
+                  variant="outline" 
+                  className="mt-6 border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+                  onClick={() => setSearchQuery("")}
+                >
+                  {t('clearAllFilters')}
+                </Button>
               </div>
-              <h3 className="mb-2 text-2xl font-bold text-neutral-900 dark:text-neutral-50">{t('noDestinationsFound')}</h3>
-              <p className="text-neutral-500 dark:text-neutral-400">{t('noDestinationsFoundDesc')}</p>
-              <Button 
-                variant="outline" 
-                className="mt-6 border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
-                onClick={() => { setSearchQuery(""); setActiveType("All"); }}
-              >
-                {t('clearAllFilters')}
-              </Button>
-            </div>
-          )}
+            )}
         </div>
       </main>
 

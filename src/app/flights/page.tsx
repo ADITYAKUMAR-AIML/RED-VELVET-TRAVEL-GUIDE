@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/context/LanguageContext";
+import { FEATURED_FLIGHTS } from "@/lib/data";
 import {
   Pagination,
   PaginationContent,
@@ -20,63 +21,8 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
-const ITEMS_PER_PAGE = 2;
+const ITEMS_PER_PAGE = 12;
 const RED_VELVET_GRADIENT = "bg-gradient-to-r from-[#8a0000] via-[#c00000] to-[#8a0000]";
-
-const FLIGHTS = [
-  {
-    id: 1,
-    airline: "Velvet Airways",
-    logo: "https://images.unsplash.com/photo-1436491865332-7a61a109c0f2?q=80&w=100&auto=format&fit=crop",
-    from: "London (LHR)",
-    to: "Santorini (JTR)",
-    departure: "08:30 AM",
-    arrival: "02:15 PM",
-    duration: "3h 45m",
-    price: "$299",
-    type: "Direct",
-    class: "Business"
-  },
-  {
-    id: 2,
-    airline: "Global Elite",
-    logo: "https://images.unsplash.com/photo-1569154941061-e231b4725ef1?q=80&w=100&auto=format&fit=crop",
-    from: "New York (JFK)",
-    to: "Tokyo (NRT)",
-    departure: "11:00 AM",
-    arrival: "03:30 PM (+1)",
-    duration: "13h 30m",
-    price: "$1,250",
-    type: "Direct",
-    class: "First Class"
-  },
-  {
-    id: 3,
-    airline: "Alpine Wings",
-    logo: "https://images.unsplash.com/photo-1544016768-982d1554f0b9?q=80&w=100&auto=format&fit=crop",
-    from: "Paris (CDG)",
-    to: "Zermatt (ZRH)",
-    departure: "09:15 AM",
-    arrival: "11:45 AM",
-    duration: "2h 30m",
-    price: "$180",
-    type: "Direct",
-    class: "Economy"
-  },
-  {
-    id: 4,
-    airline: "Velvet Airways",
-    logo: "https://images.unsplash.com/photo-1436491865332-7a61a109c0f2?q=80&w=100&auto=format&fit=crop",
-    from: "Dubai (DXB)",
-    to: "Bali (DPS)",
-    departure: "02:00 AM",
-    arrival: "01:30 PM",
-    duration: "9h 30m",
-    price: "$750",
-    type: "Direct",
-    class: "Business"
-  }
-];
 
 export default function FlightsPage() {
   const { t } = useLanguage();
@@ -94,7 +40,7 @@ export default function FlightsPage() {
       setCurrentPage(1);
     }, [fromQuery, toQuery, activeClass]);
   
-    const filteredFlights = FLIGHTS.filter(flight => {
+    const filteredFlights = FEATURED_FLIGHTS.filter(flight => {
       const matchesFrom = flight.from.toLowerCase().includes(fromQuery.toLowerCase());
       const matchesTo = flight.to.toLowerCase().includes(toQuery.toLowerCase());
       const matchesClass = activeClass === "All" || flight.class === activeClass;
@@ -109,7 +55,7 @@ export default function FlightsPage() {
 
   if (!mounted) return null;
 
-  const flightClasses = ["All", "Economy", "Business", "First Class"];
+  const flightClasses = ["All", "Economy", "Premium Economy", "Business", "First Class"];
 
   return (
     <div className="flex min-h-screen flex-col bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50 transition-colors duration-300">
@@ -209,14 +155,14 @@ export default function FlightsPage() {
                               </div>
                               
                               <div className="flex flex-col items-center gap-1 flex-1 max-w-[150px]">
-                                <p className="text-xs text-neutral-400 font-medium">{flight.duration}</p>
-                                <div className="relative w-full h-[2px] bg-neutral-200 dark:bg-neutral-700">
-                                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-neutral-900 px-2">
-                                    <Plane className="h-4 w-4 text-red-600 rotate-90" />
+                                  <p className="text-xs text-neutral-400 font-medium">{flight.duration}</p>
+                                  <div className="relative w-full h-[2px] bg-neutral-200 dark:bg-neutral-700">
+                                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-neutral-900 px-2">
+                                      <Plane className="h-4 w-4 text-red-600 rotate-90" />
+                                    </div>
                                   </div>
+                                  <p className="text-xs text-red-600 font-bold uppercase">{flight.stops}</p>
                                 </div>
-                                <p className="text-xs text-red-600 font-bold uppercase">{flight.type}</p>
-                              </div>
 
                               <div className="text-center md:text-right">
                                 <p className="text-2xl font-bold">{flight.arrival}</p>

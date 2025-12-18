@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -13,104 +14,52 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/context/LanguageContext";
+import { FEATURED_DESTINATIONS } from "@/lib/data";
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
-const ITEMS_PER_PAGE = 3;
+const ITEMS_PER_PAGE = 12;
 
-const DESTINATIONS = [
-  {
-    id: "santorini",
-    title: "Santorini, Greece",
-    price: "$1,299",
-    location: "Cyclades, Greece",
-    image: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?q=80&w=800&auto=format&fit=crop",
-    tag: "Romantic",
-    description: "Experience the magic of the Aegean with white-washed villages and stunning sunsets."
-  },
-  {
-    id: "kyoto",
-    title: "Kyoto, Japan",
-    price: "$1,450",
-    location: "Kansai, Japan",
-    image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=800&auto=format&fit=crop",
-    tag: "Cultural",
-    description: "Step back in time in the city of ten thousand shrines and traditional tea houses."
-  },
-  {
-    id: "swiss-alps",
-    title: "Swiss Alps, Switzerland",
-    price: "$1,800",
-    location: "Bernese Oberland, Switzerland",
-    image: "https://images.unsplash.com/photo-1531310197839-ccf54634509e?q=80&w=800&auto=format&fit=crop",
-    tag: "Adventure",
-    description: "Breathtaking peaks and world-class luxury in the heart of the mountains."
-  },
-  {
-    id: "bali",
-    title: "Bali, Indonesia",
-    price: "$950",
-    location: "Bali, Indonesia",
-    image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?q=80&w=800&auto=format&fit=crop",
-    tag: "Tropical",
-    description: "Find your spiritual balance in the lush jungles and serene beaches of Bali."
-  },
-  {
-    id: "bora-bora",
-    title: "Bora Bora, French Polynesia",
-    price: "$2,500",
-    location: "Society Islands, French Polynesia",
-    image: "https://images.unsplash.com/photo-1589197331516-4d84b72ebde3?q=80&w=800&auto=format&fit=crop",
-    tag: "Luxury",
-    description: "The ultimate tropical escape with overwater bungalows and turquoise lagoons."
-  },
-  {
-    id: "paris",
-    title: "Paris, France",
-    price: "$1,100",
-    location: "Île-de-France, France",
-    image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=800&auto=format&fit=crop",
-    tag: "Romantic",
-    description: "The City of Light awaits with its iconic landmarks and world-class cuisine."
-  }
-];
-
-export default function DestinationsPage() {
+function DestinationsContent() {
   const { t } = useLanguage();
   const searchParams = useSearchParams();
   const initialSearch = searchParams.get("search") || "";
-    const [searchQuery, setSearchQuery] = React.useState(initialSearch);
-    const [activeTag, setActiveTag] = React.useState("All");
-    const [mounted, setMounted] = React.useState(false);
-    const [currentPage, setCurrentPage] = React.useState(1);
+  const [searchQuery, setSearchQuery] = React.useState(initialSearch);
+  const [activeTag, setActiveTag] = React.useState("All");
+  const [mounted, setMounted] = React.useState(false);
+  const [currentPage, setCurrentPage] = React.useState(1);
   
-    React.useEffect(() => {
-      setMounted(true);
-    }, []);
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
-    React.useEffect(() => {
-      setCurrentPage(1);
-    }, [searchQuery, activeTag]);
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, activeTag]);
+
+  const allTags = React.useMemo(() => {
+    const tags = new Set(FEATURED_DESTINATIONS.map(d => d.tag));
+    return ["All", ...Array.from(tags).sort()];
+  }, []);
   
-    const filteredDestinations = DESTINATIONS.filter(d => {
-      const matchesSearch = d.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           d.location.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesTag = activeTag === "All" || d.tag === activeTag;
-      return matchesSearch && matchesTag;
-    });
+  const filteredDestinations = FEATURED_DESTINATIONS.filter(d => {
+    const matchesSearch = d.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         d.country.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesTag = activeTag === "All" || d.tag === activeTag;
+    return matchesSearch && matchesTag;
+  });
 
-    const totalPages = Math.ceil(filteredDestinations.length / ITEMS_PER_PAGE);
-    const paginatedDestinations = filteredDestinations.slice(
-      (currentPage - 1) * ITEMS_PER_PAGE,
-      currentPage * ITEMS_PER_PAGE
-    );
+  const totalPages = Math.ceil(filteredDestinations.length / ITEMS_PER_PAGE);
+  const paginatedDestinations = filteredDestinations.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   if (!mounted) return null;
 
@@ -120,10 +69,19 @@ export default function DestinationsPage() {
     "Adventure": t('adventure'),
     "Cultural": t('cultural'),
     "Tropical": t('tropical'),
-    "Luxury": t('luxury')
+    "Luxury": t('luxury'),
+    "Historic": t('historic') || "Historic",
+    "Heritage": t('heritage') || "Heritage",
+    "Nature": t('nature') || "Nature",
+    "Coastal": t('coastal') || "Coastal",
+    "Urban": t('urban') || "Urban",
+    "Spiritual": t('spiritual') || "Spiritual",
+    "Modern": t('modern') || "Modern",
+    "Scenic": t('scenic') || "Scenic",
+    "Vibrant": t('vibrant') || "Vibrant",
+    "Winter": t('winter') || "Winter",
+    "Wildlife": t('wildlife') || "Wildlife"
   };
-
-  const tags = ["All", "Romantic", "Adventure", "Cultural", "Tropical", "Luxury"];
 
   return (
     <div className="flex min-h-screen flex-col bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50 transition-colors duration-300">
@@ -150,7 +108,7 @@ export default function DestinationsPage() {
               />
             </div>
             <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0">
-              {tags.map((tag) => (
+              {allTags.slice(0, 7).map((tag) => (
                 <Badge 
                   key={tag}
                   variant={activeTag === tag ? "default" : "outline"}
@@ -167,7 +125,7 @@ export default function DestinationsPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             <AnimatePresence mode="popLayout">
               {paginatedDestinations.map((item, idx) => (
                 <motion.div
@@ -179,35 +137,28 @@ export default function DestinationsPage() {
                   transition={{ duration: 0.2 }}
                 >
                   <Link href={`/destinations/${item.id}`}>
-                    <Card className="group h-full overflow-hidden border-none bg-white dark:bg-neutral-900 shadow-sm transition-all hover:shadow-2xl">
-                      <div className="aspect-[16/10] relative">
+                    <Card className="group h-full overflow-hidden border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm transition-all hover:shadow-xl">
+                      <div className="h-48 relative overflow-hidden">
                         <Image 
                           src={item.image} 
                           alt={item.title} 
                           fill 
-                          className="object-cover transition-transform duration-700 group-hover:scale-110" 
+                          className="object-cover transition-transform duration-500 group-hover:scale-110" 
                         />
-                        <div className="absolute top-4 left-4">
-                          <Badge className="bg-red-600 text-white border-none">
+                        <div className="absolute top-3 left-3">
+                          <Badge className="bg-red-600 text-white border-none text-[10px] px-2 py-0.5">
                             {tagTranslations[item.tag] || item.tag}
                           </Badge>
                         </div>
                       </div>
-                      <CardContent className="p-6">
-                        <div className="mb-2 flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-red-600">
-                          <MapPin className="h-3 w-3" /> {item.location}
+                      <CardContent className="p-4">
+                        <h3 className="mb-2 text-base font-bold text-neutral-900 dark:text-neutral-50 line-clamp-1 group-hover:text-red-600 transition-colors">{item.title}</h3>
+                        <div className="flex items-center gap-1 text-xs text-neutral-500 dark:text-neutral-400 mb-4">
+                          <MapPin className="h-3 w-3" /> {item.country}
                         </div>
-                        <h3 className="mb-3 text-2xl font-bold text-neutral-900 dark:text-neutral-50">{item.title}</h3>
-                        <p className="mb-6 text-sm text-neutral-600 dark:text-neutral-400 line-clamp-2">
-                          {item.description}
-                        </p>
-                        <div className="flex items-center justify-between border-t border-neutral-100 dark:border-neutral-800 pt-6">
-                          <div>
-                            <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase">{t('startingFrom')}</p>
-                            <p className="text-xl font-bold text-neutral-900 dark:text-neutral-50">{item.price}</p>
-                          </div>
-                          <Button className="bg-red-600 text-white hover:bg-red-700 rounded-xl group-hover:px-6 transition-all">
-                            {t('viewDetails')} <ChevronRight className="ml-2 h-4 w-4" />
+                        <div className="flex items-center justify-between border-t border-neutral-100 dark:border-neutral-800 pt-4">
+                          <Button size="sm" className="bg-red-600 text-white hover:bg-red-700 rounded-lg text-[10px] h-8 px-3 w-full">
+                            {t('viewDetails')} <ChevronRight className="ml-1 h-3 w-3" />
                           </Button>
                         </div>
                       </CardContent>
@@ -278,14 +229,26 @@ export default function DestinationsPage() {
               </Button>
             </div>
           )}
-        </div>
-      </main>
+      </div>
+    </main>
 
-      <footer className="bg-neutral-950 py-10 text-neutral-400 text-center text-sm border-t border-neutral-800">
-        <div className="container mx-auto px-6">
-          <p>© {new Date().getFullYear()} Orchids Travel. All rights reserved.</p>
-        </div>
-      </footer>
-    </div>
+    <footer className="bg-neutral-950 py-10 text-neutral-400 text-center text-sm border-t border-neutral-800">
+      <div className="container mx-auto px-6">
+        <p>© {new Date().getFullYear()} Orchids Travel. All rights reserved.</p>
+      </div>
+    </footer>
+  </div>
+);
+}
+
+export default function DestinationsPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center bg-white dark:bg-neutral-950">
+        <div className="animate-pulse text-neutral-500">Loading...</div>
+      </div>
+    }>
+      <DestinationsContent />
+    </Suspense>
   );
 }
