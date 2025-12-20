@@ -25,48 +25,51 @@ import { useLanguage } from "@/context/LanguageContext";
 
 const RED_VELVET_GRADIENT = "bg-gradient-to-r from-[#8a0000] via-[#c00000] to-[#8a0000]";
 
-export default function DashboardPage() {
-  const { user, loading, signOut } = useAuth();
-  const { t } = useLanguage();
-  const router = useRouter();
-  const [mounted, setMounted] = React.useState(false);
+  export default function DashboardPage() {
+    const { user, profile, loading, signOut } = useAuth();
+    const { t } = useLanguage();
+    const router = useRouter();
+    const [mounted, setMounted] = React.useState(false);
 
-  React.useEffect(() => {
-    setMounted(true);
-    if (!loading && !user) {
-      router.push("/login");
-    }
-  }, [user, loading, router]);
+    React.useEffect(() => {
+      setMounted(true);
+      if (!loading && !user) {
+        router.push("/login");
+      }
+    }, [user, loading, router]);
 
-  if (!mounted || loading || !user) return null;
+    if (!mounted || loading || !user) return null;
 
-  const BOOKINGS = [
-    {
-      id: "VV-98421",
-      destination: "Santorini, Greece",
-      date: "Sept 12, 2024",
-      status: "Confirmed",
-      amount: "$2,748"
-    }
-  ];
+    const displayName = profile?.full_name || user.user_metadata?.full_name || 'Traveler';
+    const avatarSrc = profile?.avatar_url || user.user_metadata?.avatar_url || `https://avatar.vercel.sh/${user.email}`;
 
-  return (
-    <div className="flex min-h-screen flex-col bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50 transition-colors duration-300">
-      <Navbar />
+    const BOOKINGS = [
+      {
+        id: "VV-98421",
+        destination: "Santorini, Greece",
+        date: "Sept 12, 2024",
+        status: "Confirmed",
+        amount: "$2,748"
+      }
+    ];
 
-      <main className="flex-1 pt-32 pb-24">
-        <div className="container mx-auto px-6">
-          <div className="mb-12 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-            <div className="flex items-center gap-4">
-              <Avatar className="h-20 w-20 border-2 border-red-800">
-                <AvatarImage src={`https://avatar.vercel.sh/${user.email}`} />
-                <AvatarFallback>{user.email?.charAt(0).toUpperCase()}</AvatarFallback>
-              </Avatar>
-              <div>
-                <h1 className="text-3xl font-bold">{t('welcome')}, {user.user_metadata?.full_name || 'Traveler'}</h1>
-                <p className="text-neutral-500 dark:text-neutral-400">{user.email}</p>
+    return (
+      <div className="flex min-h-screen flex-col bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50 transition-colors duration-300">
+        <Navbar />
+
+        <main className="flex-1 pt-32 pb-24">
+          <div className="container mx-auto px-6">
+            <div className="mb-12 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+              <div className="flex items-center gap-4">
+                <Avatar className="h-20 w-20 border-2 border-red-800">
+                  <AvatarImage src={avatarSrc} />
+                  <AvatarFallback>{displayName.charAt(0).toUpperCase()}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <h1 className="text-3xl font-bold">{t('welcome')}, {displayName}</h1>
+                  <p className="text-neutral-500 dark:text-neutral-400">{user.email}</p>
+                </div>
               </div>
-            </div>
             <div className="flex gap-4">
               <Button variant="outline" className="border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-50">
                 <Settings className="mr-2 h-4 w-4" /> {t('accountSettings')}

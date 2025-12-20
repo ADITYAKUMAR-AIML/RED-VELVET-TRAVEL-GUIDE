@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Globe, User as UserIcon, LogOut, Sun, Moon, ChevronDown } from "lucide-react";
+import { Globe, User as UserIcon, LogOut, Sun, Moon, ChevronDown, Loader2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "./ui/button";
 import { useTheme } from "next-themes";
@@ -11,16 +11,30 @@ import { useLanguage } from "@/context/LanguageContext";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = React.useState(false);
-  const { user, signOut } = useAuth();
+  const { user, profile, loading, signOut } = useAuth();
   const { theme, setTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
   const [mounted, setMounted] = React.useState(false);
   const pathname = usePathname();
 
+  const handleLogout = async () => {
+    await signOut();
+    window.location.href = "/";
+  };
+
   const isHomePage = pathname === "/";
   
-  // STRICT LOGIC: White only on home hero, black elsewhere
-  const textColorClass = isHomePage 
+    const userName = profile?.full_name || user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split("@")[0] || t("traveler");
+    const userInitials = userName
+      .split(" ")
+      .filter(Boolean)
+      .map((n: string) => n[0])
+      .join("")
+      .toUpperCase()
+      .substring(0, 2) || "T";
+    
+    const textColorClass = isHomePage 
+
     ? (isScrolled ? "text-black dark:text-white" : "text-white")
     : "text-black dark:text-white";
 
@@ -137,39 +151,45 @@ export function Navbar() {
             ))}
           </nav>
 
-          <div className="flex items-center gap-2 md:gap-4">
-            {user ? (
-              <>
-                <Link href="/dashboard">
-                  <Button variant="ghost" size="sm" className={buttonGhostColorClass}>
-                    <UserIcon className="h-4 w-4 md:mr-2" /> 
-                    <span className="hidden md:inline">{t("profile")}</span>
+            <div className="flex items-center gap-2 md:gap-4 min-w-[120px] justify-end">
+              {loading ? (
+                <div className="flex items-center justify-center w-10 h-10">
+                  <Loader2 className={`h-5 w-5 animate-spin ${buttonGhostColorClass}`} />
+                </div>
+              ) : user ? (
+                <div className="flex items-center gap-2 md:gap-3">
+                  <Link href="/dashboard" className="flex items-center gap-2">
+                    <Button variant="ghost" size="sm" className={`${buttonGhostColorClass} px-2 flex items-center gap-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-full`}>
+                      <div className="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center text-xs font-bold shadow-lg shrink-0">
+                        {userInitials}
+                      </div>
+                      <span className="hidden md:inline font-bold">Hi, {userName}</span>
+                    </Button>
+                  </Link>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={handleLogout}
+                    className={`${buttonGhostColorClass} flex items-center gap-2 px-3 hover:text-red-600 transition-colors`}
+                  >
+                    <LogOut className="h-4 w-4" /> 
+                    <span className="hidden md:inline">{t("logout")}</span>
                   </Button>
-                </Link>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={signOut}
-                  className={buttonGhostColorClass}
-                >
-                  <LogOut className="h-4 w-4 md:mr-2" /> 
-                  <span className="hidden md:inline">{t("logout")}</span>
-                </Button>
-              </>
-            ) : (
-              <>
-                <Link href="/login">
-                  <Button variant="ghost" size="sm" className={buttonGhostColorClass}>
-                    {t("login")}
-                  </Button>
-                </Link>
-                <Link href="/signup">
-                  <Button size="sm" className="bg-neutral-900 dark:bg-neutral-50 text-white dark:text-neutral-950 hover:bg-red-600 dark:hover:bg-red-600 hover:text-white dark:hover:text-white rounded-full text-xs">
-                    {t("signup")}
-                  </Button>
-                </Link>
-              </>
-            )}
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Link href="/login">
+                    <Button variant="ghost" size="sm" className={buttonGhostColorClass}>
+                      {t("login")}
+                    </Button>
+                  </Link>
+                  <Link href="/signup">
+                    <Button size="sm" className="bg-neutral-900 dark:bg-neutral-50 text-white dark:text-neutral-950 hover:bg-red-600 dark:hover:bg-red-600 hover:text-white dark:hover:text-white rounded-full text-xs">
+                      {t("signup")}
+                    </Button>
+                  </Link>
+                </div>
+              )}
             <Link href="/destinations" className="hidden sm:block">
               <Button size="sm" className="bg-red-600 text-white hover:bg-red-700 shadow-lg shadow-red-600/30 rounded-full text-xs font-bold">
                 {t("bookNow")}

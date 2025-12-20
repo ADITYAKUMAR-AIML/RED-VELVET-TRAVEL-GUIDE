@@ -9,7 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useLanguage } from "@/context/LanguageContext";
-
+import { toast } from "sonner";
+import { mapAuthError } from "@/lib/auth-errors";
 import { useAuth } from "@/context/AuthContext";
 
 const RED_VELVET_GRADIENT = "bg-gradient-to-r from-[#8a0000] via-[#c00000] to-[#8a0000]";
@@ -22,6 +23,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -29,10 +31,11 @@ export default function LoginPage() {
   }, []);
 
   useEffect(() => {
-    if (mounted && !authLoading && user) {
-      router.push("/");
+    if (mounted && !authLoading && user && !isRedirecting) {
+      setIsRedirecting(true);
+      window.location.href = "/"; // Force a full reload to ensure context is fresh
     }
-  }, [mounted, authLoading, user, router]);
+  }, [mounted, authLoading, user, isRedirecting]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,17 +48,25 @@ export default function LoginPage() {
     });
 
     if (error) {
-      setError(error.message);
+      setError(t(mapAuthError(error.message)));
       setLoading(false);
     } else {
+      toast.success(t('welcomeBack') || "Welcome back!");
+      setIsRedirecting(true);
       router.push("/");
-      router.refresh();
+      // Full refresh only if necessary, but with middleware and router.push it should work
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 500);
     }
   };
 
-  if (!mounted || authLoading) return null;
+  if (!mounted) return null;
 
-  if (user) return null;
+  if (user && !isRedirecting) {
+    window.location.href = "/";
+    return null;
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-white dark:bg-neutral-950 p-6 transition-colors duration-300">

@@ -3,10 +3,12 @@
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Star, MapPin, Wifi, Coffee, Utensils, Waves, Search, ChevronRight, Heart } from "lucide-react";
+import { Star, MapPin, Wifi, Coffee, Utensils, Waves, Search, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { Navbar } from "@/components/Navbar";
+import { LikeButton } from "@/components/LikeButton";
+import { LocationSection } from "@/components/LocationSection";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -353,9 +355,12 @@ export default function HotelsPage() {
                               fill 
                               className="object-cover transition-transform duration-500 group-hover:scale-110" 
                             />
-                            <button className="absolute top-3 right-3 p-2 bg-white/80 dark:bg-neutral-900/80 rounded-full backdrop-blur-sm hover:bg-white dark:hover:bg-neutral-900 transition-colors">
-                              <Heart className="h-4 w-4 text-neutral-600 dark:text-neutral-400" />
-                            </button>
+<LikeButton 
+                              itemType="hotel" 
+                              itemId={hotel.id.toString()} 
+                              className="absolute top-3 right-3" 
+                              size="sm" 
+                            />
                             <Badge className="absolute top-3 left-3 bg-red-600 text-white border-none text-[10px]">
                               Popular
                             </Badge>
@@ -450,9 +455,43 @@ export default function HotelsPage() {
                   {t('clearAllFilters')}
                 </Button>
               </div>
-            )}
-        </div>
-      </main>
+              )}
+          </div>
+
+          <div className="mt-24">
+            <LocationSection 
+              title="Explore Mumbai"
+              subtitle="The City of Dreams offers everything from heritage luxury to modern sea-view hotels."
+              location="Mumbai"
+              type="hotel"
+              href="/hotels?location=Mumbai"
+            />
+
+            <LocationSection 
+              title="Explore Rajasthan"
+              subtitle="Live like royalty in our handpicked collection of heritage palaces and forts."
+              location="Rajasthan"
+              type="hotel"
+              href="/hotels?location=Rajasthan"
+            />
+
+            <LocationSection 
+              title="Explore Bengaluru"
+              subtitle="Discover luxury in the Garden City, perfect for both business and leisure."
+              location="Bengaluru"
+              type="hotel"
+              href="/hotels?location=Bengaluru"
+            />
+
+            <LocationSection 
+              title="Explore Goa"
+              subtitle="Unwind in premium beach resorts and boutique stays across the sunny coast."
+              location="Goa"
+              type="hotel"
+              href="/hotels?location=Goa"
+            />
+          </div>
+        </main>
 
       <footer className="bg-neutral-950 py-10 text-white/50 text-center text-sm border-t border-neutral-800">
         <div className="container mx-auto px-6">

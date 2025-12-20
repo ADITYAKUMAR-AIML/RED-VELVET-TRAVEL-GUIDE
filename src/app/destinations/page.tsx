@@ -9,6 +9,8 @@ import { MapPin, Search, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { Navbar } from "@/components/Navbar";
+import { LikeButton } from "@/components/LikeButton";
+import { LocationSection } from "@/components/LocationSection";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -136,21 +138,27 @@ function DestinationsContent() {
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <Link href={`/destinations/${item.id}`}>
-                    <Card className="group h-full overflow-hidden border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm transition-all hover:shadow-xl">
-                      <div className="h-48 relative overflow-hidden">
-                        <Image 
-                          src={item.image} 
-                          alt={item.title} 
-                          fill 
-                          className="object-cover transition-transform duration-500 group-hover:scale-110" 
-                        />
-                        <div className="absolute top-3 left-3">
-                          <Badge className="bg-red-600 text-white border-none text-[10px] px-2 py-0.5">
-                            {tagTranslations[item.tag] || item.tag}
-                          </Badge>
+                    <Link href={`/destinations/${item.id}`}>
+                      <Card className="group h-full max-w-[350px] mx-auto overflow-hidden border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm transition-all hover:shadow-xl">
+                        <div className="h-48 relative overflow-hidden">
+                          <Image 
+                            src={item.image} 
+                            alt={item.title} 
+                            fill 
+                            className="object-cover transition-transform duration-500 group-hover:scale-110" 
+                          />
+                          <LikeButton 
+                            itemType="destination" 
+                            itemId={item.id} 
+                            className="absolute top-3 right-3" 
+                            size="sm" 
+                          />
+                          <div className="absolute top-3 left-3">
+                            <Badge className="bg-red-600 text-white border-none text-[10px] px-2 py-0.5">
+                              {tagTranslations[item.tag] || item.tag}
+                            </Badge>
+                          </div>
                         </div>
-                      </div>
                       <CardContent className="p-4">
                         <h3 className="mb-2 text-base font-bold text-neutral-900 dark:text-neutral-50 line-clamp-1 group-hover:text-red-600 transition-colors">{item.title}</h3>
                         <div className="flex items-center gap-1 text-xs text-neutral-500 dark:text-neutral-400 mb-4">
@@ -228,9 +236,43 @@ function DestinationsContent() {
                 {t('clearAllFilters')}
               </Button>
             </div>
-          )}
-      </div>
-    </main>
+              )}
+          </div>
+
+          <div className="mt-24">
+            <LocationSection 
+              title="Explore Rajasthan"
+              subtitle="Discover the land of kings, from the pink city of Jaipur to the golden sands of Jaisalmer."
+              location="Rajasthan"
+              type="destination"
+              href="/destinations?location=Rajasthan"
+            />
+
+            <LocationSection 
+              title="Explore Kerala"
+              subtitle="Experience God's Own Country with its peaceful backwaters and lush tea plantations."
+              location="Kerala"
+              type="destination"
+              href="/destinations?location=Kerala"
+            />
+
+            <LocationSection 
+              title="Explore Ladakh"
+              subtitle="Adventure awaits in the high-altitude desert of the Himalayas."
+              location="Leh"
+              type="destination"
+              href="/destinations?location=Leh"
+            />
+
+            <LocationSection 
+              title="Explore Goa"
+              subtitle="From sun-kissed beaches to vibrant nightlife, discover the best of India's coastal paradise."
+              location="Goa"
+              type="destination"
+              href="/destinations?location=Goa"
+            />
+          </div>
+        </main>
 
     <footer className="bg-neutral-950 py-10 text-neutral-400 text-center text-sm border-t border-neutral-800">
       <div className="container mx-auto px-6">

@@ -2,18 +2,20 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Mail, Phone, Send } from "lucide-react";
+import { Mail, Phone, Send, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Navbar } from "@/components/Navbar";
 import { useLanguage } from "@/context/LanguageContext";
+import { useAuth } from "@/context/AuthContext";
 
 const RED_VELVET_GRADIENT = "bg-gradient-to-r from-[#8a0000] via-[#c00000] to-[#8a0000]";
 
 export default function ContactPage() {
   const { t } = useLanguage();
+  const { user, profile, loading: authLoading } = useAuth();
   const [mounted, setMounted] = React.useState(false);
   const [formData, setFormData] = React.useState({
     name: "",
@@ -26,8 +28,21 @@ export default function ContactPage() {
     setMounted(true);
   }, []);
 
+  // Sync formData with auth state
+  React.useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        name: profile?.full_name || prev.name || "",
+        email: user.email || ""
+      }));
+    }
+  }, [user, profile]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) return;
+    
     setStatus("sending");
     
     try {
@@ -64,7 +79,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h4 className="font-bold text-neutral-900 dark:text-neutral-50">{t('emailUs')}</h4>
-                  <p className="text-neutral-500 dark:text-neutral-400">support@orchidstravel.com</p>
+                  <p className="text-neutral-500 dark:text-neutral-400">kumaradityasrm@gmail.com</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
@@ -79,7 +94,26 @@ export default function ContactPage() {
             </div>
 
             <Card className="md:col-span-2 border-none bg-white dark:bg-neutral-900 shadow-2xl p-8">
-              {status === "sent" ? (
+              {authLoading ? (
+                <div className="flex items-center justify-center py-20">
+                  <div className="h-8 w-8 animate-spin rounded-full border-4 border-red-600 border-t-transparent"></div>
+                </div>
+              ) : !user ? (
+                <div className="text-center py-12">
+                  <div className="h-20 w-20 bg-neutral-100 dark:bg-neutral-800 text-neutral-400 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Lock className="h-10 w-10" />
+                  </div>
+                  <h2 className="text-3xl font-bold mb-4">Authentication Required</h2>
+                  <p className="text-neutral-500 dark:text-neutral-400 mb-8">
+                    Please log in to your account to send an inquiry to our specialists.
+                  </p>
+                  <Link href="/login">
+                    <Button className={`px-10 h-14 text-lg font-bold ${RED_VELVET_GRADIENT}`}>
+                      Login to Continue
+                    </Button>
+                  </Link>
+                </div>
+              ) : status === "sent" ? (
                 <div className="text-center py-12">
                   <div className="h-20 w-20 bg-green-100 dark:bg-green-950 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center mx-auto mb-6">
                     <Send className="h-10 w-10" />
@@ -90,29 +124,17 @@ export default function ContactPage() {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-sm font-bold uppercase text-neutral-500 dark:text-neutral-400">{t('fullName')}</label>
-                      <Input 
-                        placeholder="John Doe" 
-                        required 
-                        className="bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700"
-                        value={formData.name}
-                        onChange={e => setFormData({...formData, name: e.target.value})}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-bold uppercase text-neutral-500 dark:text-neutral-400">{t('emailAddress')}</label>
-                      <Input 
-                        type="email" 
-                        placeholder="john@example.com" 
-                        required 
-                        className="bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700"
-                        value={formData.email}
-                        onChange={e => setFormData({...formData, email: e.target.value})}
-                      />
-                    </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold uppercase text-neutral-500 dark:text-neutral-400">{t('fullName')}</label>
+                    <Input 
+                      placeholder="John Doe" 
+                      required 
+                      className="bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700"
+                      value={formData.name}
+                      onChange={e => setFormData({...formData, name: e.target.value})}
+                    />
                   </div>
+                  
                   <div className="space-y-2">
                     <label className="text-sm font-bold uppercase text-neutral-500 dark:text-neutral-400">{t('yourInquiry')}</label>
                     <Textarea 
@@ -126,6 +148,9 @@ export default function ContactPage() {
                   <Button type="submit" disabled={status === "sending"} className={`w-full h-16 text-xl font-bold ${RED_VELVET_GRADIENT} text-white`}>
                     {status === "sending" ? t('sending') : t('sendInquiry')}
                   </Button>
+                  <p className="text-xs text-center text-neutral-400">
+                    Sending inquiry as <span className="text-red-600 font-bold">{user.email}</span>
+                  </p>
                 </form>
               )}
             </Card>

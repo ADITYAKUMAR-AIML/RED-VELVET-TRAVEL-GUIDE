@@ -3,10 +3,12 @@
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Clock, Users, Gift, Sparkles, Search, ChevronRight, Heart, Star } from "lucide-react";
+import { Clock, Users, Gift, Sparkles, Search, ChevronRight, Star } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { Navbar } from "@/components/Navbar";
+import { LikeButton } from "@/components/LikeButton";
+import { LocationSection } from "@/components/LocationSection";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -365,7 +367,7 @@ export default function PackagesPage() {
                       transition={{ delay: idx * 0.05 }}
                     >
                       <Link href={`/packages/${tour.id}`}>
-                        <Card className="group overflow-hidden border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm transition-all hover:shadow-xl cursor-pointer h-full">
+                        <Card className="group max-w-[350px] mx-auto overflow-hidden border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm transition-all hover:shadow-xl cursor-pointer h-full">
                           <div className="relative h-48 overflow-hidden">
                             <Image 
                               src={tour.image} 
@@ -373,9 +375,12 @@ export default function PackagesPage() {
                               fill 
                               className="object-cover transition-transform duration-500 group-hover:scale-110" 
                             />
-                            <button className="absolute top-3 right-3 p-2 bg-white/80 dark:bg-neutral-900/80 rounded-full backdrop-blur-sm hover:bg-white dark:hover:bg-neutral-900 transition-colors">
-                              <Heart className="h-4 w-4 text-neutral-600 dark:text-neutral-400" />
-                            </button>
+<LikeButton 
+                                itemType="package" 
+                                itemId={tour.id.toString()} 
+                                className="absolute top-3 right-3" 
+                                size="sm" 
+                              />
                             <Badge className="absolute top-3 left-3 bg-red-600 text-white border-none text-[10px]">
                               Popular
                             </Badge>
@@ -472,9 +477,43 @@ export default function PackagesPage() {
                   {t('clearAllFilters')}
                 </Button>
               </div>
-            )}
-        </div>
-      </main>
+              )}
+          </div>
+
+          <div className="mt-24">
+            <LocationSection 
+              title="Explore Kerala"
+              subtitle="Unwind in God's Own Country with serene backwaters and tea-covered hills."
+              location="Kerala"
+              type="package"
+              href="/packages?location=Kerala"
+            />
+
+            <LocationSection 
+              title="Explore Rajasthan"
+              subtitle="Experience royal hospitality in the land of kings with our curated heritage tours."
+              location="Rajasthan"
+              type="package"
+              href="/packages?location=Rajasthan"
+            />
+
+            <LocationSection 
+              title="Explore Goa"
+              subtitle="Beyond the beaches: discover the colonial history and lush landscapes of Goa."
+              location="Goa"
+              type="package"
+              href="/packages?location=Goa"
+            />
+
+            <LocationSection 
+              title="Historic Hampi"
+              subtitle="Step back in time at the ruins of the Vijayanagara Empire, a UNESCO World Heritage site."
+              location="Hampi"
+              type="package"
+              href="/packages?location=Hampi"
+            />
+          </div>
+        </main>
 
       <footer className="bg-neutral-950 py-10 text-white/50 text-center text-sm border-t border-neutral-800">
         <div className="container mx-auto px-6">
