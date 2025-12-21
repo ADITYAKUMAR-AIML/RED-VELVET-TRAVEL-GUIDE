@@ -54,15 +54,12 @@ export default function SignupPage() {
       setError(error.message);
       setLoading(false);
     } else {
-      if (data.user) {
-        // Automatically sign in or redirect to home
-        // In many Supabase configs, signUp returns a session if email confirmation is off
-        // If not, we still redirect to home as requested, the AuthContext will handle the state
+      if (data.session) {
+        // User is signed in automatically (email confirmation disabled)
         router.push("/");
-        setTimeout(() => {
-          router.refresh();
-        }, 500);
-      } else {
+        router.refresh();
+      } else if (data.user) {
+        // User created but email confirmation required
         router.push("/login?message=Check your email to confirm your account");
       }
     }

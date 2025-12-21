@@ -46,33 +46,42 @@ function ScrollTracingLine({ contentRef }: { contentRef: React.RefObject<HTMLDiv
   });
 
   const scaleY = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
+    stiffness: 200,
+    damping: 50,
     restDelta: 0.001
   });
 
-  const opacity = useTransform(scrollYProgress, [0, 0.02], [0, 1]);
+  const opacity = useTransform(scrollYProgress, [0, 0.01], [0, 1]);
   const dotTop = useTransform(scaleY, (v) => `${v * 100}%`);
 
   return (
     <motion.div 
       style={{ opacity }}
-      className="absolute left-4 md:left-8 top-0 bottom-0 w-px z-40 pointer-events-none hidden lg:block"
+      className="absolute left-6 md:left-12 top-0 bottom-0 w-1 z-50 pointer-events-none hidden lg:block"
     >
-      <div className="absolute inset-0 border-l-2 border-dotted border-neutral-300 dark:border-neutral-700" />
+      <div 
+        className="absolute inset-0 w-[2px] h-full opacity-50 dark:opacity-20"
+        style={{
+          backgroundImage: `radial-gradient(circle, #666 1px, transparent 1px)`,
+          backgroundSize: '1px 8px',
+          backgroundRepeat: 'repeat-y'
+        }}
+      />
       <motion.div 
-        className="absolute top-0 left-[-1px] w-[3px] bg-red-600 origin-top"
+        className="absolute top-0 left-[-1px] w-[3px] bg-red-600 origin-top shadow-[0_0_8px_rgba(220,38,38,0.3)]"
         style={{ scaleY, height: '100%' }}
       />
       <motion.div 
-        className="absolute left-[-4px] w-2.5 h-2.5 rounded-full bg-red-600 shadow-[0_0_10px_rgba(220,38,38,0.5)]"
+        className="absolute left-[-5px] w-3 h-3 rounded-full bg-red-600 shadow-[0_0_15px_rgba(220,38,38,0.6)] flex items-center justify-center"
         style={{ top: dotTop }}
-      />
+      >
+        <div className="w-1 h-1 rounded-full bg-white" />
+      </motion.div>
     </motion.div>
   );
 }
 
-function HomePage() {
+export default function HomePage() {
   const { t } = useLanguage();
   const { user, loading: authLoading, initialized } = useAuth();
   const contentRef = useRef<HTMLDivElement>(null);

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { FEATURED_HOTELS } from '@/lib/data';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -19,6 +20,14 @@ export async function GET(request: Request) {
     return NextResponse.json(data);
   } catch (error) {
     console.error('Error fetching featured hotels:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    const q = (location || '').toLowerCase();
+    const fallback = FEATURED_HOTELS
+      .filter(h => 
+        !q || 
+        h.location?.toLowerCase().includes(q) || 
+        h.name?.toLowerCase().includes(q)
+      )
+      .slice(0, 8);
+    return NextResponse.json(fallback);
   }
 }

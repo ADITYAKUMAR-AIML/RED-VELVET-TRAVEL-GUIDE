@@ -24,7 +24,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
-const ITEMS_PER_PAGE = 8;
+const ITEMS_PER_PAGE = 12;
 const RED_VELVET_GRADIENT = "bg-gradient-to-r from-[#8a0000] via-[#c00000] to-[#8a0000]";
 
 const INDIAN_STATES = [
@@ -458,39 +458,7 @@ export default function HotelsPage() {
               )}
           </div>
 
-          <div className="mt-24">
-            <LocationSection 
-              title="Explore Mumbai"
-              subtitle="The City of Dreams offers everything from heritage luxury to modern sea-view hotels."
-              location="Mumbai"
-              type="hotel"
-              href="/hotels?location=Mumbai"
-            />
 
-            <LocationSection 
-              title="Explore Rajasthan"
-              subtitle="Live like royalty in our handpicked collection of heritage palaces and forts."
-              location="Rajasthan"
-              type="hotel"
-              href="/hotels?location=Rajasthan"
-            />
-
-            <LocationSection 
-              title="Explore Bengaluru"
-              subtitle="Discover luxury in the Garden City, perfect for both business and leisure."
-              location="Bengaluru"
-              type="hotel"
-              href="/hotels?location=Bengaluru"
-            />
-
-            <LocationSection 
-              title="Explore Goa"
-              subtitle="Unwind in premium beach resorts and boutique stays across the sunny coast."
-              location="Goa"
-              type="hotel"
-              href="/hotels?location=Goa"
-            />
-          </div>
         </main>
 
       <footer className="bg-neutral-950 py-10 text-white/50 text-center text-sm border-t border-neutral-800">

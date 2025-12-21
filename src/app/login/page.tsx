@@ -22,6 +22,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [needsConfirmation, setNeedsConfirmation] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const router = useRouter();
@@ -32,15 +33,15 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (mounted && !authLoading && user && !isRedirecting) {
-      setIsRedirecting(true);
-      window.location.href = "/"; // Force a full reload to ensure context is fresh
+      router.push("/");
     }
-  }, [mounted, authLoading, user, isRedirecting]);
+  }, [mounted, authLoading, user, isRedirecting, router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setNeedsConfirmation(false);
 
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -48,23 +49,52 @@ export default function LoginPage() {
     });
 
     if (error) {
-      setError(t(mapAuthError(error.message)));
+      const errorKey = mapAuthError(error.message);
+      setError(t(errorKey));
       setLoading(false);
+      
+      if (errorKey === 'errorEmailNotConfirmed') {
+        setNeedsConfirmation(true);
+      }
     } else {
       toast.success(t('welcomeBack') || "Welcome back!");
-      setIsRedirecting(true);
       router.push("/");
-      // Full refresh only if necessary, but with middleware and router.push it should work
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 500);
+      router.refresh();
+    }
+  };
+
+  const handleResendConfirmation = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email,
+      });
+
+      if (error) {
+        // Handle rate limit specifically for resend
+        if (error.message.includes("rate limit") || error.status === 429) {
+             setError(t('errorRateLimit'));
+        } else {
+             setError(error.message);
+        }
+      } else {
+        toast.success(t('checkEmailConfirm') || "Please check your email to confirm your account.");
+        setNeedsConfirmation(false); // Hide the button to prevent spamming
+      }
+    } catch (err) {
+      console.error("Error resending confirmation:", err);
+      setError(t('errorUnexpected'));
+    } finally {
+      setLoading(false);
     }
   };
 
   if (!mounted) return null;
 
   if (user && !isRedirecting) {
-    window.location.href = "/";
     return null;
   }
 
@@ -88,6 +118,19 @@ export default function LoginPage() {
             {error && (
               <div className="rounded-md bg-red-50 dark:bg-red-950 p-3 text-sm text-red-500 dark:text-red-400">
                 {error}
+                {needsConfirmation && (
+                  <div className="mt-2">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={handleResendConfirmation}
+                      className="w-full border-red-200 text-red-700 hover:bg-red-100 hover:text-red-800 dark:border-red-800 dark:text-red-300 dark:hover:bg-red-900/50"
+                    >
+                      Resend Confirmation Email
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
             <div className="space-y-2">

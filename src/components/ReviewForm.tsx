@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useLanguage } from "@/context/LanguageContext";
 
+import { toast } from "sonner";
+
 interface ReviewFormProps {
   itemId: string;
   itemType: string;
@@ -23,23 +25,38 @@ export function ReviewForm({ itemId, itemType, onSuccess }: ReviewFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user) {
+      toast.error(t('loginToReview') || "Please log in to share your experience.");
+      return;
+    }
+
+    if (comment.trim().length < 10) {
+      toast.error(t('reviewTooShort') || "Review must be at least 10 characters long.");
+      return;
+    }
 
     setLoading(true);
-    const { error } = await supabase.from("reviews").insert({
-      user_id: user.id,
-      user_email: user.email,
-      item_id: itemId,
-      item_type: itemType,
-      rating,
-      comment,
-    });
+    try {
+      const { error } = await supabase.from("reviews").insert({
+        user_id: user.id,
+        user_email: user.email || 'Anonymous',
+        item_id: itemId,
+        item_type: itemType,
+        rating,
+        comment: comment.trim(),
+      });
 
-    setLoading(false);
-    if (!error) {
+      if (error) throw error;
+
+      toast.success(t('reviewSubmitted') || "Thank you! Your review has been submitted.");
       setComment("");
       setRating(5);
       onSuccess();
+    } catch (error: any) {
+      console.error("Review submission error:", error);
+      toast.error(t('reviewError') || "Failed to submit review. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 

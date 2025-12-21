@@ -43,10 +43,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           .from('profiles')
           .select('*')
           .eq('id', userId)
-          .maybeSingle(); // Use maybeSingle to avoid 406 errors on single() when not found
+          .maybeSingle();
 
         if (error) {
-          console.error('Error fetching profile:', error);
+          // If the error is PGRST116 (JSON object requested, multiple (or no) rows returned), it's handled by maybeSingle
+          // But other errors like permission denied (401/403) should be noted
+          if (error.code !== 'PGRST116') {
+             console.warn('Error fetching profile (might be RLS or missing table):', error.message);
+          }
+          
           if (retries > 0) {
             await new Promise(resolve => setTimeout(resolve, 500));
             return fetchProfile(userId, retries - 1);
@@ -55,23 +60,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
         return data;
       } catch (error) {
-        console.error('Error fetching profile:', error);
+        console.error('Unexpected error fetching profile:', error);
         return null;
       }
     }, []);
 
   const syncProfileWithAuth = useCallback(async (user: User): Promise<Profile | null> => {
     try {
-      const userProfile = await fetchProfile(user.id);
+      // 1. Try to fetch existing profile first
+      let userProfile = await fetchProfile(user.id);
       
-      // Get user metadata for fallback values
+      // If we found a profile, we might not need to upsert immediately unless data is missing
+      if (userProfile && userProfile.full_name) {
+         return userProfile;
+      }
+
+      // 2. If no profile or missing name, prepare data from metadata
       const userMetadata = user.user_metadata || {};
       const fullName = userMetadata.full_name || userMetadata.name || 
                        userProfile?.full_name || 'Traveler';
       const avatarUrl = userMetadata.avatar_url || userProfile?.avatar_url;
       const email = user.email || userProfile?.email;
 
-      // Prepare profile data
       const profileData = {
         id: user.id,
         full_name: fullName,
@@ -80,7 +90,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         updated_at: new Date().toISOString()
       };
 
-      // Upsert the profile
+      // 3. Try to upsert (Insert or Update)
+      // This handles cases where:
+      // - Profile doesn't exist (Insert)
+      // - Profile exists but we want to sync metadata (Update)
+      // Note: If RLS blocks this, we catch the error and return the fallback/fetched profile
       const { data: syncedProfile, error } = await supabase
         .from('profiles')
         .upsert(profileData)
@@ -88,21 +102,35 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         .single();
 
       if (error) {
-        console.error('Error syncing profile:', error);
-        return userProfile; // Return existing profile if upsert fails
+        console.warn('Error syncing/upserting profile (ignoring if RLS prevents update):', error.message);
+        // If upsert fails, return what we have (fetched profile or constructed one)
+        // We construct a temporary profile object so the UI still works
+        return userProfile || {
+            ...profileData,
+            updated_at: new Date().toISOString() 
+        } as Profile;
       }
 
       return syncedProfile;
     } catch (error) {
       console.error('Error in syncProfileWithAuth:', error);
-      return null;
+      // Return a temporary profile object based on user data
+      return {
+        id: user.id,
+        full_name: user.user_metadata?.full_name || user.user_metadata?.name || 'Traveler',
+        avatar_url: user.user_metadata?.avatar_url,
+        email: user.email,
+        updated_at: new Date().toISOString()
+      } as Profile;
     }
   }, [fetchProfile]);
 
     const handleAuthChange = useCallback(async (session: Session | null, event?: string) => {
-      // Don't show global loading if we're just syncing profile in the background
-      // unless it's the initial initialization
-      if (!initialized) setLoading(true);
+      // Set loading to true for sign-in/sign-out events to prevent UI flicker
+      // Token refreshes shouldn't trigger a full loading state
+      const shouldSetLoading = !initialized || event === 'SIGNED_IN' || event === 'SIGNED_OUT';
+      
+      if (shouldSetLoading) setLoading(true);
       
       try {
         if (session?.user) {
@@ -131,7 +159,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(null);
         setProfile(null);
       } finally {
-        setLoading(false);
+        if (shouldSetLoading) setLoading(false);
         setInitialized(true);
       }
     }, [syncProfileWithAuth, initialized]);

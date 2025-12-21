@@ -219,12 +219,12 @@ export default function DestinationDetailsPage() {
                       </div>
                     </div>
 
-                    <Button 
-                      className={`w-full ${RED_VELVET_GRADIENT} py-7 text-lg font-bold shadow-xl text-white`}
-                      onClick={() => router.push(`/booking/${destination.id}`)}
-                    >
-                      {t('bookTripNow')}
-                    </Button>
+<Button 
+                        className={`w-full ${RED_VELVET_GRADIENT} py-7 text-lg font-bold shadow-xl text-white`}
+                        onClick={() => router.push(`/booking?id=${destination.id}&type=destination`)}
+                      >
+                        {t('bookTripNow')}
+                      </Button>
 
                     <Button 
                       variant="outline" 

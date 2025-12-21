@@ -60,71 +60,71 @@ export function LocationSection({
           </Link>
         </div>
 
-        <div className="flex gap-4 overflow-x-auto pb-8 scrollbar-hide snap-x scroll-smooth">
-          {loading ? (
-            Array(4).fill(0).map((_, i) => (
-              <div key={i} className="min-w-[280px] lg:min-w-[calc(25%-12px)] h-[350px] bg-neutral-100 dark:bg-neutral-900 rounded-2xl animate-pulse" />
-            ))
-          ) : (
-            items.map((item, idx) => (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.05 }}
-                className="min-w-[280px] sm:min-w-[320px] lg:min-w-[calc(25%-12px)] snap-start"
-              >
-                <Link href={`/${type}s/${item.id}`}>
-                  <div className="group cursor-pointer h-full flex flex-col">
-                    <div className="relative aspect-[4/5] overflow-hidden rounded-2xl mb-4 shadow-sm">
-                      <img 
-                        src={item.image_url || item.image} 
-                        alt={item.name || item.title} 
-                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" 
-                      />
-                      <LikeButton 
-                        itemType={type} 
-                        itemId={item.id} 
-                        className="absolute top-3 right-3 shadow-md" 
-                      />
-                      {type === 'package' && item.duration && (
-                        <div className="absolute top-3 left-3 bg-white/95 dark:bg-neutral-900/95 px-2 py-1 rounded-lg text-[10px] font-black shadow-sm uppercase tracking-wider">
-                          {item.duration}
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    </div>
-                    <div className="space-y-1">
-                      <div className="flex items-center justify-between">
-                        <h3 className="font-bold text-neutral-900 dark:text-neutral-50 text-base line-clamp-1 group-hover:text-red-600 transition-colors">
-                          {item.name || item.title}
-                        </h3>
-                        {(type === 'hotel' || type === 'destination') && (
-                          <div className="flex items-center gap-1">
-                            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                            <span className="text-xs font-bold text-neutral-500">{item.rating || '5.0'}</span>
+          <div className="flex gap-3 overflow-x-auto pb-8 scrollbar-hide snap-x scroll-smooth">
+            {loading ? (
+              Array(6).fill(0).map((_, i) => (
+                <div key={i} className="min-w-[160px] sm:min-w-[200px] lg:min-w-[calc(16.666%-10px)] aspect-square bg-neutral-100 dark:bg-neutral-900 rounded-lg animate-pulse" />
+              ))
+            ) : (
+              items.map((item, idx) => (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, y: 15 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.02 }}
+                  className="min-w-[160px] sm:min-w-[200px] lg:min-w-[calc(16.666%-10px)] snap-start"
+                >
+                  <Link href={`/${type}s/${item.id}`}>
+                    <div className="group cursor-pointer h-full flex flex-col">
+                      <div className="relative aspect-square overflow-hidden rounded-lg mb-2">
+                        <img 
+                          src={item.image_url || item.image} 
+                          alt={item.name || item.title} 
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                        />
+                        <LikeButton 
+                          itemType={type} 
+                          itemId={item.id} 
+                          className="absolute top-1.5 right-1.5 shadow-sm scale-75 sm:scale-90" 
+                          size="sm"
+                        />
+                        {type === 'package' && item.duration && (
+                          <div className="absolute top-1.5 left-1.5 bg-white/95 dark:bg-neutral-900/95 px-1.5 py-0.5 rounded text-[8px] font-extrabold shadow-sm uppercase tracking-tighter">
+                            {item.duration}
                           </div>
                         )}
                       </div>
-                      <div className="flex items-center gap-1 text-xs text-neutral-500 dark:text-neutral-400">
-                        <MapPin className="h-3.5 w-3.5" /> {item.location || item.country || item.destination}
-                      </div>
-                      <div className="pt-2 flex items-center justify-between">
-                        <span className="text-lg font-black text-neutral-900 dark:text-white">
-                          {item.price}
-                        </span>
-                        <span className="text-[10px] text-neutral-500 uppercase font-bold tracking-widest">
-                          {type === 'hotel' ? t('perNight') : t('allInclusive')}
-                        </span>
+                      <div className="space-y-0">
+                        <div className="flex items-center justify-between">
+                          <h3 className="font-bold text-neutral-900 dark:text-neutral-50 text-[11px] sm:text-xs line-clamp-1 group-hover:text-red-600 transition-colors">
+                            {item.name || item.title}
+                          </h3>
+                          {(type === 'hotel' || type === 'destination') && (
+                            <div className="flex items-center gap-0.5">
+                              <Star className="h-2 w-2 fill-yellow-400 text-yellow-400" />
+                              <span className="text-[9px] text-neutral-500">{item.rating || '5'}.0</span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1 text-[9px] sm:text-[10px] text-neutral-500 dark:text-neutral-400">
+                          <MapPin className="h-2.5 w-2.5" /> {item.location || item.country || item.destination}
+                        </div>
+                        <div className="pt-0.5 flex items-center justify-between">
+                          <span className="text-[11px] sm:text-xs font-bold text-neutral-900 dark:text-white">
+                            {item.price}
+                          </span>
+                          <span className="text-[8px] text-neutral-500 uppercase tracking-tighter">
+                            {type === 'hotel' ? `/ ${t('perNight')}` : t('allInclusive')}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Link>
-              </motion.div>
-            ))
-          )}
-        </div>
+                  </Link>
+                </motion.div>
+              ))
+            )}
+          </div>
       </div>
     </section>
   );

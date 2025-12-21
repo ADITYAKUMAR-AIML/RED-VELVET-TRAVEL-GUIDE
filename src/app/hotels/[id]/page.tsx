@@ -184,9 +184,12 @@ export default function HotelDetailsPage() {
                 </div>
                 <CardContent className="p-8">
                   <div className="space-y-6">
-                    <Button className={`w-full ${RED_VELVET_GRADIENT} py-7 text-lg font-bold shadow-xl text-white`}>
-                      {t('bookYourStay') || 'Book Your Stay'}
-                    </Button>
+<Button 
+                        className={`w-full ${RED_VELVET_GRADIENT} py-7 text-lg font-bold shadow-xl text-white`}
+                        onClick={() => router.push(`/booking?id=${hotel.id}&type=hotel`)}
+                      >
+                        {t('bookYourStay') || 'Book Your Stay'}
+                      </Button>
                     <Button variant="outline" className="w-full border-red-900 dark:border-red-700 py-7 text-lg font-bold text-red-900 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950">
                       {t('checkAvailability') || 'Check Availability'}
                     </Button>

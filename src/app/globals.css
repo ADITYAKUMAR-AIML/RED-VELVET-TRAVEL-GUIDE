@@ -1,3 +1,9 @@
+/* Updated: 2025-12-21T06:56:15.759Z */
+/* Updated: 2025-12-21T06:55:41.370Z */
+/* Updated: 2025-12-21T06:55:30.924Z */
+/* Updated: 2025-12-20T23:26:56.413Z */
+/* Updated: 2025-12-20T11:53:58.411Z */
+/* Updated: 2025-12-20T11:52:14.542Z */
 /* Updated: 2025-12-20T08:29:04.928Z */
 /* Updated: 2025-12-20T07:14:11.757Z */
 /* Updated: 2025-12-19T14:14:56.712Z */
@@ -134,6 +140,9 @@
   }
   body {
     @apply bg-background text-foreground;
+    zoom: 0.9;
+    -moz-transform: scale(0.9);
+    -moz-transform-origin: top center;
   }
 }
 /* Hide Next.js dev indicator portal */

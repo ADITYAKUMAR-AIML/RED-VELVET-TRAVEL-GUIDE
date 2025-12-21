@@ -176,9 +176,12 @@ export default function PackageDetailsPage() {
                       </div>
                     </div>
 
-                    <Button className={`w-full ${RED_VELVET_GRADIENT} py-7 text-lg font-bold shadow-xl text-white`}>
-                      {t('bookPackageNow') || 'Book This Package'}
-                    </Button>
+<Button 
+                        className={`w-full ${RED_VELVET_GRADIENT} py-7 text-lg font-bold shadow-xl text-white`}
+                        onClick={() => router.push(`/booking?id=${pkg.id}&type=package`)}
+                      >
+                        {t('bookPackageNow') || 'Book This Package'}
+                      </Button>
                     <Button variant="outline" className="w-full border-red-900 dark:border-red-700 py-7 text-lg font-bold text-red-900 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950">
                       {t('customizeItinerary') || 'Customize Itinerary'}
                     </Button>

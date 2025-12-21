@@ -29,17 +29,21 @@ export function ReviewSection({ itemId, itemType }: ReviewSectionProps) {
   const [loading, setLoading] = React.useState(true);
 
   const fetchReviews = React.useCallback(async () => {
-    const { data, error } = await supabase
-      .from("reviews")
-      .select("*")
-      .eq("item_id", itemId)
-      .eq("item_type", itemType)
-      .order("created_at", { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from("reviews")
+        .select("*")
+        .eq("item_id", itemId)
+        .eq("item_type", itemType)
+        .order("created_at", { ascending: false });
 
-    if (!error && data) {
-      setReviews(data);
+      if (error) throw error;
+      if (data) setReviews(data);
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [itemId, itemType]);
 
   React.useEffect(() => {
@@ -84,11 +88,13 @@ export function ReviewSection({ itemId, itemType }: ReviewSectionProps) {
                   className="rounded-2xl border border-neutral-100 p-6 dark:border-neutral-800"
                 >
                   <div className="mb-4 flex items-center justify-between">
-                    <div>
-                      <p className="font-bold text-neutral-900 dark:text-neutral-50">
-                        {review.user_email ? review.user_email.split('@')[0] : 'Traveler'}
-                      </p>
-                      <p className="text-xs text-neutral-500">
+                      <div>
+                        <p className="font-bold text-neutral-900 dark:text-neutral-50">
+                          {review.user_email && review.user_email.includes('@') 
+                            ? review.user_email.split('@')[0] 
+                            : (review.user_email || 'Traveler')}
+                        </p>
+                        <p className="text-xs text-neutral-500">
                         {new Date(review.created_at).toLocaleDateString()}
                       </p>
                     </div>

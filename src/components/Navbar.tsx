@@ -24,7 +24,27 @@ export function Navbar() {
 
   const isHomePage = pathname === "/";
   
-    const userName = profile?.full_name || user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split("@")[0] || t("traveler");
+    // Determine the display name:
+    // 1. Profile full name
+    // 2. User metadata full name or name
+    // 3. Email username (formatted)
+    // 4. Fallback "Traveler"
+    const getDisplayName = () => {
+      if (profile?.full_name) return profile.full_name;
+      if (user?.user_metadata?.full_name) return user.user_metadata.full_name;
+      if (user?.user_metadata?.name) return user.user_metadata.name;
+      
+      if (user?.email) {
+        const emailName = user.email.split("@")[0];
+        // Capitalize first letter
+        return emailName.charAt(0).toUpperCase() + emailName.slice(1);
+      }
+      
+      return t("traveler");
+    };
+
+    const userName = getDisplayName();
+
     const userInitials = userName
       .split(" ")
       .filter(Boolean)
