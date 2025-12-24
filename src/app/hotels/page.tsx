@@ -35,249 +35,19 @@ const INDIAN_STATES = [
   { id: "karnataka", name: "Karnataka", icon: "🛕" },
 ];
 
-const HOTELS_BY_STATE: Record<string, typeof HOTELS> = {
-  rajasthan: [
-    {
-      id: 101,
-      name: "Taj Lake Palace",
-      location: "Udaipur, Rajasthan",
-      price: "₹45,000",
-      rating: 5,
-      type: "Heritage",
-      state: "rajasthan",
-      image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=800&auto=format&fit=crop",
-      amenities: ["Lake View", "Spa", "Heritage Tours", "Fine Dining"]
-    },
-    {
-      id: 102,
-      name: "Umaid Bhawan Palace",
-      location: "Jodhpur, Rajasthan",
-      price: "₹52,000",
-      rating: 5,
-      type: "Palace",
-      state: "rajasthan",
-      image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=800&auto=format&fit=crop",
-      amenities: ["Royal Spa", "Pool", "Museum", "Butler Service"]
-    },
-    {
-      id: 103,
-      name: "Rambagh Palace",
-      location: "Jaipur, Rajasthan",
-      price: "₹38,000",
-      rating: 5,
-      type: "Heritage",
-      state: "rajasthan",
-      image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=800&auto=format&fit=crop",
-      amenities: ["Peacock Garden", "Spa", "Polo Grounds", "Heritage Walk"]
-    },
-    {
-      id: 104,
-      name: "Suryagarh Jaisalmer",
-      location: "Jaisalmer, Rajasthan",
-      price: "₹28,000",
-      rating: 5,
-      type: "Resort",
-      state: "rajasthan",
-      image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=800&auto=format&fit=crop",
-      amenities: ["Desert Safari", "Pool", "Spa", "Cultural Shows"]
-    },
-  ],
-  kerala: [
-    {
-      id: 201,
-      name: "Kumarakom Lake Resort",
-      location: "Kumarakom, Kerala",
-      price: "₹32,000",
-      rating: 5,
-      type: "Resort",
-      state: "kerala",
-      image: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?q=80&w=800&auto=format&fit=crop",
-      amenities: ["Backwater View", "Ayurveda Spa", "Houseboat", "Yoga"]
-    },
-    {
-      id: 202,
-      name: "Taj Bekal Resort & Spa",
-      location: "Bekal, Kerala",
-      price: "₹28,000",
-      rating: 5,
-      type: "Resort",
-      state: "kerala",
-      image: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?q=80&w=800&auto=format&fit=crop",
-      amenities: ["Private Pool", "Ayurveda", "Beach Access", "Spa"]
-    },
-    {
-      id: 203,
-      name: "Spice Village Thekkady",
-      location: "Thekkady, Kerala",
-      price: "₹18,000",
-      rating: 4,
-      type: "Eco Resort",
-      state: "kerala",
-      image: "https://images.unsplash.com/photo-1596176530529-78163a4f7af2?q=80&w=800&auto=format&fit=crop",
-      amenities: ["Spice Garden", "Wildlife Safari", "Pool", "Cooking Class"]
-    },
-    {
-      id: 204,
-      name: "Coconut Lagoon",
-      location: "Kumarakom, Kerala",
-      price: "₹22,000",
-      rating: 5,
-      type: "Heritage",
-      state: "kerala",
-      image: "https://images.unsplash.com/photo-1439130490301-25e322d88054?q=80&w=800&auto=format&fit=crop",
-      amenities: ["Houseboat", "Backwaters", "Ayurveda", "Bird Watching"]
-    },
-  ],
-  goa: [
-    {
-      id: 301,
-      name: "Taj Exotica Resort & Spa",
-      location: "South Goa",
-      price: "₹25,000",
-      rating: 5,
-      type: "Beach Resort",
-      state: "goa",
-      image: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?q=80&w=800&auto=format&fit=crop",
-      amenities: ["Private Beach", "Spa", "Golf Course", "Pool"]
-    },
-    {
-      id: 302,
-      name: "W Goa",
-      location: "North Goa",
-      price: "₹22,000",
-      rating: 5,
-      type: "Luxury",
-      state: "goa",
-      image: "https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=800&auto=format&fit=crop",
-      amenities: ["Beach Access", "Infinity Pool", "Nightclub", "Spa"]
-    },
-    {
-      id: 303,
-      name: "The Leela Goa",
-      location: "South Goa",
-      price: "₹20,000",
-      rating: 5,
-      type: "Resort",
-      state: "goa",
-      image: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=800&auto=format&fit=crop",
-      amenities: ["Lagoon View", "Golf", "Spa", "Multiple Restaurants"]
-    },
-    {
-      id: 304,
-      name: "Alila Diwa Goa",
-      location: "South Goa",
-      price: "₹18,000",
-      rating: 5,
-      type: "Boutique",
-      state: "goa",
-      image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=800&auto=format&fit=crop",
-      amenities: ["Paddy Field View", "Infinity Pool", "Spa", "Yoga"]
-    },
-  ],
-  maharashtra: [
-    {
-      id: 401,
-      name: "Taj Mahal Palace",
-      location: "Mumbai, Maharashtra",
-      price: "₹35,000",
-      rating: 5,
-      type: "Heritage",
-      state: "maharashtra",
-      image: "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?q=80&w=800&auto=format&fit=crop",
-      amenities: ["Sea View", "Heritage Tours", "Spa", "Fine Dining"]
-    },
-    {
-      id: 402,
-      name: "The Oberoi Mumbai",
-      location: "Mumbai, Maharashtra",
-      price: "₹28,000",
-      rating: 5,
-      type: "Luxury",
-      state: "maharashtra",
-      image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=800&auto=format&fit=crop",
-      amenities: ["Ocean View", "Spa", "Rooftop Pool", "Business Center"]
-    },
-    {
-      id: 403,
-      name: "Della Resorts",
-      location: "Lonavala, Maharashtra",
-      price: "₹15,000",
-      rating: 4,
-      type: "Adventure Resort",
-      state: "maharashtra",
-      image: "https://images.unsplash.com/photo-1596436889106-be35e843f974?q=80&w=800&auto=format&fit=crop",
-      amenities: ["Adventure Park", "Spa", "Pool", "Camp Fire"]
-    },
-    {
-      id: 404,
-      name: "Radisson Blu Pune",
-      location: "Pune, Maharashtra",
-      price: "₹12,000",
-      rating: 4,
-      type: "Business",
-      state: "maharashtra",
-      image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=800&auto=format&fit=crop",
-      amenities: ["Pool", "Gym", "Spa", "Business Lounge"]
-    },
-  ],
-  karnataka: [
-    {
-      id: 501,
-      name: "Taj West End",
-      location: "Bengaluru, Karnataka",
-      price: "₹18,000",
-      rating: 5,
-      type: "Heritage",
-      state: "karnataka",
-      image: "https://images.unsplash.com/photo-1596176530529-78163a4f7af2?q=80&w=800&auto=format&fit=crop",
-      amenities: ["Garden View", "Spa", "Pool", "Heritage Walk"]
-    },
-    {
-      id: 502,
-      name: "Evolve Back Coorg",
-      location: "Coorg, Karnataka",
-      price: "₹42,000",
-      rating: 5,
-      type: "Luxury Resort",
-      state: "karnataka",
-      image: "https://images.unsplash.com/photo-1600100397608-e0c91c249fdd?q=80&w=800&auto=format&fit=crop",
-      amenities: ["Private Pool", "Coffee Plantation", "Spa", "Wildlife"]
-    },
-    {
-      id: 503,
-      name: "JW Marriott Bengaluru",
-      location: "Bengaluru, Karnataka",
-      price: "₹15,000",
-      rating: 5,
-      type: "Business",
-      state: "karnataka",
-      image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=800&auto=format&fit=crop",
-      amenities: ["Rooftop Pool", "Spa", "Fine Dining", "Gym"]
-    },
-    {
-      id: 504,
-      name: "Orange County Kabini",
-      location: "Kabini, Karnataka",
-      price: "₹35,000",
-      rating: 5,
-      type: "Wildlife Resort",
-      state: "karnataka",
-      image: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?q=80&w=800&auto=format&fit=crop",
-      amenities: ["Safari", "Pool", "Spa", "Nature Walks"]
-    },
-  ],
-};
-
-const HOTELS = Object.values(HOTELS_BY_STATE).flat();
-
 export default function HotelsPage() {
   const { t } = useLanguage();
   const [mounted, setMounted] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [currentPage, setCurrentPage] = React.useState(1);
+  const [hotels, setHotels] = React.useState<any[]>([]);
 
   React.useEffect(() => {
     setMounted(true);
+    fetch("/api/admin/data?table=hotels")
+      .then(res => res.json())
+      .then(data => setHotels(data))
+      .catch(err => console.error("Error fetching hotels:", err));
   }, []);
 
   React.useEffect(() => {
@@ -285,12 +55,12 @@ export default function HotelsPage() {
   }, [searchQuery]);
 
   const filteredHotels = React.useMemo(() => {
-    if (!searchQuery) return HOTELS;
-    return HOTELS.filter(hotel => 
+    if (!searchQuery) return hotels;
+    return hotels.filter(hotel => 
       hotel.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
       hotel.location.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [searchQuery]);
+  }, [searchQuery, hotels]);
 
   const totalPages = Math.ceil(filteredHotels.length / ITEMS_PER_PAGE);
   const paginatedHotels = filteredHotels.slice(
@@ -299,7 +69,7 @@ export default function HotelsPage() {
   );
 
   const getFilteredHotels = (stateId: string) => {
-    const stateHotels = HOTELS_BY_STATE[stateId] || [];
+    const stateHotels = hotels.filter(h => h.state === stateId);
     if (!searchQuery) return stateHotels;
     return stateHotels.filter(hotel => 
       hotel.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -348,13 +118,13 @@ export default function HotelsPage() {
                     >
                       <Link href={`/hotels/${hotel.id}`}>
                         <Card className="group overflow-hidden border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm transition-all hover:shadow-xl cursor-pointer h-full">
-                          <div className="relative h-48 overflow-hidden">
-                            <Image 
-                              src={hotel.image} 
-                              alt={hotel.name} 
-                              fill 
-                              className="object-cover transition-transform duration-500 group-hover:scale-110" 
-                            />
+                            <div className="relative h-48 overflow-hidden">
+                              <Image 
+                                src={hotel.image_url || hotel.image} 
+                                alt={hotel.name} 
+                                fill 
+                                className="object-cover transition-transform duration-500 group-hover:scale-110" 
+                              />
 <LikeButton 
                               itemType="hotel" 
                               itemId={hotel.id.toString()} 

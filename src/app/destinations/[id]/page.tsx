@@ -23,50 +23,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { ReviewSection } from "@/components/ReviewSection";
+import { supabase } from "@/lib/supabase";
 
 const RED_VELVET_GRADIENT = "bg-gradient-to-r from-[#8a0000] via-[#c00000] to-[#8a0000]";
-
-const DESTINATIONS = [
-  {
-    id: "santorini",
-    title: "Santorini, Greece",
-    price: "$1,299",
-    location: "Cyclades, Greece",
-    image: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?q=80&w=1200&auto=format&fit=crop",
-    tag: "Romantic",
-    rating: 4.9,
-    reviews: 128,
-    description: "Santorini is one of the Cyclades islands in the Aegean Sea. It was devastated by a volcanic eruption in the 16th century BC, forever shaping its rugged landscape. The whitewashed, cubiform houses of its 2 principal towns, Fira and Oia, cling to cliffs above an underwater caldera (crater). They overlook the sea, small islands to the west and beaches made up of black, red and white lava pebbles.",
-    highlights: ["Sunset in Oia", "Private Boat Tour", "Wine Tasting", "Black Sand Beaches"],
-    amenities: ["Boutique Hotel", "Private Pool", "Daily Breakfast", "Airport Transfer"]
-  },
-  {
-    id: "kyoto",
-    title: "Kyoto, Japan",
-    price: "$1,450",
-    location: "Kansai, Japan",
-    image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=1200&auto=format&fit=crop",
-    tag: "Cultural",
-    rating: 4.8,
-    reviews: 95,
-    description: "Kyoto, once the capital of Japan, is a city on the island of Honshu. It's famous for its numerous classical Buddhist temples, as well as gardens, imperial palaces, Shinto shrines and traditional wooden houses. It's also known for formal traditions such as kaiseki dining, consisting of multiple courses of precise dishes, and geisha, female entertainers often found in the Gion district.",
-    highlights: ["Arashiyama Bamboo Grove", "Kinkaku-ji (Golden Pavilion)", "Gion District Walk", "Traditional Tea Ceremony"],
-    amenities: ["Ryokan Stay", "Kaiseki Meals", "Local Guide", "Pocket Wi-Fi"]
-  },
-  {
-    id: "swiss-alps",
-    title: "Swiss Alps, Switzerland",
-    price: "$1,800",
-    location: "Bernese Oberland, Switzerland",
-    image: "https://images.unsplash.com/photo-1531310197839-ccf54634509e?q=80&w=1200&auto=format&fit=crop",
-    tag: "Adventure",
-    rating: 5.0,
-    reviews: 210,
-    description: "The Swiss Alps are the portion of the Alps mountain range that lies within Switzerland. Because of their central location within the entire Alpine range, they are also known as the Central Alps. The highest summit in the Swiss Alps is Monte Rosa (4,634 metres), near the Swiss-Italian border.",
-    highlights: ["Jungfraujoch Sphinx Observatory", "Glacier Express Train", "Interlaken Paragliding", "Lucerne Lake Cruise"],
-    amenities: ["Alpine Resort", "Ski Pass", "Wellness Spa", "Train Passes"]
-  }
-];
 
 export default function DestinationDetailsPage() {
   const { id } = useParams();
@@ -74,14 +33,42 @@ export default function DestinationDetailsPage() {
   const { user } = useAuth();
   const { t } = useLanguage();
   const [mounted, setMounted] = React.useState(false);
+  const [destination, setDestination] = React.useState<any>(null);
+  const [loading, setLoading] = React.useState(true);
   
-  const destination = DESTINATIONS.find(d => d.id === id) || DESTINATIONS[0];
-
   React.useEffect(() => {
     setMounted(true);
-  }, []);
+    const fetchDestination = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('destinations')
+          .select('*')
+          .eq('id', id)
+          .single();
+        
+          if (data) {
+            setDestination({
+              ...data,
+              title: data.name || data.title,
+              image: data.image_url || data.image,
+              tag: data.tag || "Discovery",
+              rating: data.rating || 4.5,
+              reviews: 0, // Will be handled by ReviewSection
+              highlights: data.highlights || ["Local Sightseeing", "Cultural Experience", "Professional Guide"],
+              amenities: data.amenities || ["Transport", "Meals", "Stay"]
+            });
+          }
+        } catch (err) {
+          console.error("Error fetching destination:", err);
+        } finally {
+          setLoading(false);
+        }
 
-  if (!mounted) return null;
+    };
+    fetchDestination();
+  }, [id]);
+
+  if (!mounted || loading || !destination) return null;
 
   return (
     <div className="flex min-h-screen flex-col bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50 transition-colors duration-300">

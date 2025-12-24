@@ -35,269 +35,19 @@ const INDIAN_STATES = [
   { id: "karnataka", name: "Karnataka", icon: "🛕" },
 ];
 
-const TOURS_BY_STATE: Record<string, any[]> = {
-  rajasthan: [
-    {
-      id: 101,
-      title: "Royal Rajasthan Heritage Tour",
-      destination: "Jaipur, Udaipur & Jodhpur",
-      price: "₹45,000",
-      duration: "7 Days",
-      groupSize: "Up to 8",
-      rating: 4.9,
-      state: "rajasthan",
-      image: "https://images.unsplash.com/photo-1477587458883-47145ed94245?q=80&w=800&auto=format&fit=crop",
-      features: ["Palace Tours", "Desert Safari", "Cultural Shows"]
-    },
-    {
-      id: 102,
-      title: "Jaipur Pink City Explorer",
-      destination: "Jaipur, Rajasthan",
-      price: "₹18,000",
-      duration: "3 Days",
-      groupSize: "Up to 12",
-      rating: 4.8,
-      state: "rajasthan",
-      image: "https://images.unsplash.com/photo-1599661046289-e31897846e41?q=80&w=800&auto=format&fit=crop",
-      features: ["Amber Fort", "City Palace", "Local Markets"]
-    },
-    {
-      id: 103,
-      title: "Desert Nights Jaisalmer",
-      destination: "Jaisalmer, Rajasthan",
-      price: "₹25,000",
-      duration: "4 Days",
-      groupSize: "Up to 6",
-      rating: 4.7,
-      state: "rajasthan",
-      image: "https://images.unsplash.com/photo-1545126178-862cdb469409?q=80&w=800&auto=format&fit=crop",
-      features: ["Camel Safari", "Desert Camp", "Fort Visit"]
-    },
-    {
-      id: 104,
-      title: "Lakes & Palaces Udaipur",
-      destination: "Udaipur, Rajasthan",
-      price: "₹22,000",
-      duration: "4 Days",
-      groupSize: "2 Persons",
-      rating: 4.9,
-      state: "rajasthan",
-      image: "https://images.unsplash.com/photo-1568495248636-6432b97bd949?q=80&w=800&auto=format&fit=crop",
-      features: ["Lake Pichola Cruise", "City Palace", "Romantic Dinner"]
-    },
-  ],
-  kerala: [
-    {
-      id: 201,
-      title: "Kerala Backwaters Bliss",
-      destination: "Alleppey & Kumarakom",
-      price: "₹35,000",
-      duration: "5 Days",
-      groupSize: "2-4 Persons",
-      rating: 4.9,
-      state: "kerala",
-      image: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?q=80&w=800&auto=format&fit=crop",
-      features: ["Houseboat Stay", "Ayurveda Spa", "Village Tour"]
-    },
-    {
-      id: 202,
-      title: "Munnar Tea Garden Retreat",
-      destination: "Munnar, Kerala",
-      price: "₹22,000",
-      duration: "4 Days",
-      groupSize: "Up to 6",
-      rating: 4.8,
-      state: "kerala",
-      image: "https://images.unsplash.com/photo-1593693397690-362cb9666fc2?q=80&w=800&auto=format&fit=crop",
-      features: ["Tea Plantation Tour", "Trekking", "Wildlife Spotting"]
-    },
-    {
-      id: 203,
-      title: "Thekkady Wildlife Safari",
-      destination: "Thekkady, Kerala",
-      price: "₹28,000",
-      duration: "4 Days",
-      groupSize: "Up to 8",
-      rating: 4.7,
-      state: "kerala",
-      image: "https://images.unsplash.com/photo-1596176530529-78163a4f7af2?q=80&w=800&auto=format&fit=crop",
-      features: ["Periyar Safari", "Spice Garden", "Bamboo Rafting"]
-    },
-    {
-      id: 204,
-      title: "Kovalam Beach Escape",
-      destination: "Kovalam, Kerala",
-      price: "₹20,000",
-      duration: "3 Days",
-      groupSize: "2 Persons",
-      rating: 4.6,
-      state: "kerala",
-      image: "https://images.unsplash.com/photo-1590123825626-1c2c9b2d7c90?q=80&w=800&auto=format&fit=crop",
-      features: ["Beach Resort", "Ayurveda", "Lighthouse Visit"]
-    },
-  ],
-  goa: [
-    {
-      id: 301,
-      title: "Goa Beach Party Package",
-      destination: "North Goa",
-      price: "₹18,000",
-      duration: "4 Days",
-      groupSize: "Up to 10",
-      rating: 4.7,
-      state: "goa",
-      image: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?q=80&w=800&auto=format&fit=crop",
-      features: ["Beach Hopping", "Nightlife", "Water Sports"]
-    },
-    {
-      id: 302,
-      title: "Heritage Goa Explorer",
-      destination: "Old Goa & Panjim",
-      price: "₹15,000",
-      duration: "3 Days",
-      groupSize: "Up to 12",
-      rating: 4.8,
-      state: "goa",
-      image: "https://images.unsplash.com/photo-1587922546307-776227941871?q=80&w=800&auto=format&fit=crop",
-      features: ["Church Tours", "Portuguese Heritage", "Local Cuisine"]
-    },
-    {
-      id: 303,
-      title: "South Goa Serenity",
-      destination: "South Goa",
-      price: "₹25,000",
-      duration: "5 Days",
-      groupSize: "2 Persons",
-      rating: 4.9,
-      state: "goa",
-      image: "https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=800&auto=format&fit=crop",
-      features: ["Private Beach", "Spa Retreat", "Sunset Cruise"]
-    },
-    {
-      id: 304,
-      title: "Goa Adventure Sports",
-      destination: "Goa",
-      price: "₹22,000",
-      duration: "4 Days",
-      groupSize: "Up to 8",
-      rating: 4.6,
-      state: "goa",
-      image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=800&auto=format&fit=crop",
-      features: ["Scuba Diving", "Parasailing", "Jet Skiing"]
-    },
-  ],
-  maharashtra: [
-    {
-      id: 401,
-      title: "Mumbai City Heritage Walk",
-      destination: "Mumbai, Maharashtra",
-      price: "₹12,000",
-      duration: "2 Days",
-      groupSize: "Up to 15",
-      rating: 4.7,
-      state: "maharashtra",
-      image: "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?q=80&w=800&auto=format&fit=crop",
-      features: ["Gateway of India", "Street Food Tour", "Bollywood Tour"]
-    },
-    {
-      id: 402,
-      title: "Lonavala Hill Station Retreat",
-      destination: "Lonavala, Maharashtra",
-      price: "₹15,000",
-      duration: "3 Days",
-      groupSize: "Up to 8",
-      rating: 4.6,
-      state: "maharashtra",
-      image: "https://images.unsplash.com/photo-1596436889106-be35e843f974?q=80&w=800&auto=format&fit=crop",
-      features: ["Waterfalls", "Caves", "Adventure Activities"]
-    },
-    {
-      id: 403,
-      title: "Ajanta Ellora Heritage",
-      destination: "Aurangabad, Maharashtra",
-      price: "₹20,000",
-      duration: "3 Days",
-      groupSize: "Up to 12",
-      rating: 4.9,
-      state: "maharashtra",
-      image: "https://images.unsplash.com/photo-1590123825626-1c2c9b2d7c90?q=80&w=800&auto=format&fit=crop",
-      features: ["UNESCO Sites", "Cave Paintings", "History Tours"]
-    },
-    {
-      id: 404,
-      title: "Mahabaleshwar Getaway",
-      destination: "Mahabaleshwar, Maharashtra",
-      price: "₹18,000",
-      duration: "3 Days",
-      groupSize: "Up to 6",
-      rating: 4.7,
-      state: "maharashtra",
-      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=800&auto=format&fit=crop",
-      features: ["Strawberry Farms", "Valley Views", "Boating"]
-    },
-  ],
-  karnataka: [
-    {
-      id: 501,
-      title: "Bengaluru Tech & Culture",
-      destination: "Bengaluru, Karnataka",
-      price: "₹14,000",
-      duration: "3 Days",
-      groupSize: "Up to 10",
-      rating: 4.6,
-      state: "karnataka",
-      image: "https://images.unsplash.com/photo-1596176530529-78163a4f7af2?q=80&w=800&auto=format&fit=crop",
-      features: ["Palace Visit", "Craft Beer Tour", "Street Food"]
-    },
-    {
-      id: 502,
-      title: "Coorg Coffee Trail",
-      destination: "Coorg, Karnataka",
-      price: "₹28,000",
-      duration: "4 Days",
-      groupSize: "2-4 Persons",
-      rating: 4.9,
-      state: "karnataka",
-      image: "https://images.unsplash.com/photo-1600100397608-e0c91c249fdd?q=80&w=800&auto=format&fit=crop",
-      features: ["Coffee Plantation", "Waterfall Trek", "Tibetan Camp"]
-    },
-    {
-      id: 503,
-      title: "Hampi Heritage Explorer",
-      destination: "Hampi, Karnataka",
-      price: "₹18,000",
-      duration: "3 Days",
-      groupSize: "Up to 12",
-      rating: 4.8,
-      state: "karnataka",
-      image: "https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?q=80&w=800&auto=format&fit=crop",
-      features: ["UNESCO Ruins", "Boulder Climbing", "Sunset Points"]
-    },
-    {
-      id: 504,
-      title: "Mysore Royal Experience",
-      destination: "Mysore, Karnataka",
-      price: "₹22,000",
-      duration: "4 Days",
-      groupSize: "Up to 8",
-      rating: 4.8,
-      state: "karnataka",
-      image: "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?q=80&w=800&auto=format&fit=crop",
-      features: ["Palace Tour", "Brindavan Gardens", "Silk Shopping"]
-    },
-  ],
-};
-
-const PACKAGES = Object.values(TOURS_BY_STATE).flat();
-
 export default function PackagesPage() {
   const { t } = useLanguage();
   const [mounted, setMounted] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [currentPage, setCurrentPage] = React.useState(1);
+  const [packages, setPackages] = React.useState<any[]>([]);
 
   React.useEffect(() => {
     setMounted(true);
+    fetch("/api/admin/data?table=packages")
+      .then(res => res.json())
+      .then(data => setPackages(data))
+      .catch(err => console.error("Error fetching packages:", err));
   }, []);
 
   React.useEffect(() => {
@@ -305,12 +55,12 @@ export default function PackagesPage() {
   }, [searchQuery]);
 
   const filteredPackages = React.useMemo(() => {
-    if (!searchQuery) return PACKAGES;
-    return PACKAGES.filter(tour => 
+    if (!searchQuery) return packages;
+    return packages.filter(tour => 
       tour.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
       tour.destination.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [searchQuery]);
+  }, [searchQuery, packages]);
 
   const totalPages = Math.ceil(filteredPackages.length / ITEMS_PER_PAGE);
   const paginatedPackages = filteredPackages.slice(
@@ -319,7 +69,7 @@ export default function PackagesPage() {
   );
 
   const getFilteredTours = (stateId: string) => {
-    const stateTours = TOURS_BY_STATE[stateId] || [];
+    const stateTours = packages.filter(p => p.state === stateId);
     if (!searchQuery) return stateTours;
     return stateTours.filter(tour => 
       tour.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -370,7 +120,7 @@ export default function PackagesPage() {
                         <Card className="group max-w-[350px] mx-auto overflow-hidden border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm transition-all hover:shadow-xl cursor-pointer h-full">
                           <div className="relative h-48 overflow-hidden">
                             <Image 
-                              src={tour.image} 
+                              src={tour.image_url || tour.image} 
                               alt={tour.title} 
                               fill 
                               className="object-cover transition-transform duration-500 group-hover:scale-110" 

@@ -22,65 +22,46 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/context/LanguageContext";
 import { ReviewSection } from "@/components/ReviewSection";
+import { supabase } from "@/lib/supabase";
 
 const RED_VELVET_GRADIENT = "bg-gradient-to-r from-[#8a0000] via-[#c00000] to-[#8a0000]";
-
-const HOTELS = [
-  {
-    id: 1,
-    name: "The Velvet Oasis",
-    location: "Santorini, Greece",
-    price: "$450",
-    rating: 5,
-    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1200&auto=format&fit=crop",
-    amenities: ["Free Wifi", "Breakfast Included", "Infinity Pool", "Luxury Spa"],
-    description: "Experience the pinnacle of luxury at The Velvet Oasis. Nestled on the cliffs of Oia, our hotel offers breathtaking views of the Aegean Sea and the famous Santorini sunset. Each suite is designed with elegance and comfort in mind, featuring private balconies and high-end amenities."
-  },
-  {
-    id: 2,
-    name: "Imperial Gardens",
-    location: "Kyoto, Japan",
-    price: "$380",
-    rating: 5,
-    image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1200&auto=format&fit=crop",
-    amenities: ["Free Wifi", "Traditional Breakfast", "Zen Garden", "Private Tea Room"],
-    description: "Imperial Gardens blends traditional Japanese architecture with modern luxury. Located in the heart of Kyoto's historic district, our ryokan-style hotel provides a serene escape with meticulously maintained gardens and authentic tea ceremonies."
-  },
-  {
-    id: 3,
-    name: "Alpine Majesty Resort",
-    location: "Zermatt, Switzerland",
-    price: "$550",
-    rating: 5,
-    image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=1200&auto=format&fit=crop",
-    amenities: ["Ski-in/Ski-out", "Thermal Spa", "Gourmet Dining", "En-suite Fireplace"],
-    description: "Perched high in the Swiss Alps, Alpine Majesty Resort is a haven for mountain lovers. Enjoy direct access to world-class ski slopes, relax in our state-of-the-art thermal spa, and dine at our Michelin-starred restaurant with views of the Matterhorn."
-  },
-  {
-    id: 4,
-    name: "Azure Lagoon Retreat",
-    location: "Bora Bora",
-    price: "$890",
-    rating: 5,
-    image: "https://images.unsplash.com/photo-1439130490301-25e322d88054?q=80&w=1200&auto=format&fit=crop",
-    amenities: ["Overwater Villa", "Private Beach", "Butler Service", "Exclusive Diving"],
-    description: "Discover paradise at Azure Lagoon Retreat. Our overwater villas offer direct access to the crystal-clear lagoon, where you can swim with tropical fish right from your deck. With personalized butler service and a private beach, your every wish is our command."
-  }
-];
 
 export default function HotelDetailsPage() {
   const { id } = useParams();
   const router = useRouter();
   const { t } = useLanguage();
   const [mounted, setMounted] = React.useState(false);
+  const [hotel, setHotel] = React.useState<any>(null);
+  const [loading, setLoading] = React.useState(true);
   
-  const hotel = HOTELS.find(h => h.id.toString() === id) || HOTELS[0];
-
   React.useEffect(() => {
     setMounted(true);
-  }, []);
+    const fetchHotel = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('hotels')
+          .select('*')
+          .eq('id', id)
+          .single();
+        
+          if (data) {
+            setHotel({
+              ...data,
+              image: data.image_url || data.image,
+              amenities: data.amenities || ["Free Wifi", "Breakfast Included", "Pool"],
+            });
+          }
+        } catch (err) {
+          console.error("Error fetching hotel:", err);
+        } finally {
+          setLoading(false);
+        }
 
-  if (!mounted) return null;
+    };
+    fetchHotel();
+  }, [id]);
+
+  if (!mounted || loading || !hotel) return null;
 
   return (
     <div className="flex min-h-screen flex-col bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50 transition-colors duration-300">

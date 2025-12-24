@@ -10,7 +10,6 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/context/LanguageContext";
-import { FEATURED_FLIGHTS } from "@/lib/data";
 import {
   Pagination,
   PaginationContent,
@@ -31,21 +30,42 @@ export default function FlightsPage() {
     const [toQuery, setToQuery] = React.useState("");
     const [activeClass, setActiveClass] = React.useState("All");
     const [currentPage, setCurrentPage] = React.useState(1);
+    const [flights, setFlights] = React.useState<any[]>([]);
   
     React.useEffect(() => {
       setMounted(true);
+      fetch("/api/admin/data?table=flights")
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data)) {
+            setFlights(data);
+          }
+        })
+        .catch(err => console.error("Error fetching flights:", err));
     }, []);
 
     React.useEffect(() => {
       setCurrentPage(1);
     }, [fromQuery, toQuery, activeClass]);
   
-    const filteredFlights = FEATURED_FLIGHTS.filter(flight => {
-      const matchesFrom = flight.from.toLowerCase().includes(fromQuery.toLowerCase());
-      const matchesTo = flight.to.toLowerCase().includes(toQuery.toLowerCase());
+    const filteredFlights = flights.filter(flight => {
+      const from = flight.origin || "";
+      const to = flight.destination || "";
+      const matchesFrom = from.toLowerCase().includes(fromQuery.toLowerCase());
+      const matchesTo = to.toLowerCase().includes(toQuery.toLowerCase());
       const matchesClass = activeClass === "All" || flight.class === activeClass;
       return matchesFrom && matchesTo && matchesClass;
     });
+
+    const formatTime = (dateStr: string) => {
+      if (!dateStr) return "--:--";
+      try {
+        const date = new Date(dateStr);
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      } catch (e) {
+        return "--:--";
+      }
+    };
 
     const totalPages = Math.ceil(filteredFlights.length / ITEMS_PER_PAGE);
     const paginatedFlights = filteredFlights.slice(
@@ -147,28 +167,28 @@ export default function FlightsPage() {
                             </Badge>
                           </div>
 
-                          <div className="flex flex-1 flex-col p-8 md:flex-row md:items-center md:justify-between gap-8">
-                            <div className="flex flex-1 items-center justify-between md:justify-start md:gap-12">
-                              <div className="text-center md:text-left">
-                                <p className="text-2xl font-bold">{flight.departure}</p>
-                                <p className="text-sm text-neutral-500">{flight.from}</p>
-                              </div>
-                              
-                              <div className="flex flex-col items-center gap-1 flex-1 max-w-[150px]">
-                                  <p className="text-xs text-neutral-400 font-medium">{flight.duration}</p>
-                                  <div className="relative w-full h-[2px] bg-neutral-200 dark:bg-neutral-700">
-                                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-neutral-900 px-2">
-                                      <Plane className="h-4 w-4 text-red-600 rotate-90" />
-                                    </div>
-                                  </div>
-                                  <p className="text-xs text-red-600 font-bold uppercase">{flight.stops}</p>
+                            <div className="flex flex-1 flex-col p-8 md:flex-row md:items-center md:justify-between gap-8">
+                              <div className="flex flex-1 items-center justify-between md:justify-start md:gap-12">
+                                <div className="text-center md:text-left">
+                                  <p className="text-2xl font-bold">{formatTime(flight.departure_time)}</p>
+                                  <p className="text-sm text-neutral-500">{flight.origin}</p>
                                 </div>
-
-                              <div className="text-center md:text-right">
-                                <p className="text-2xl font-bold">{flight.arrival}</p>
-                                <p className="text-sm text-neutral-500">{flight.to}</p>
+                                
+                                <div className="flex flex-col items-center gap-1 flex-1 max-w-[150px]">
+                                    <p className="text-xs text-neutral-400 font-medium">{flight.duration || "Direct"}</p>
+                                    <div className="relative w-full h-[2px] bg-neutral-200 dark:bg-neutral-700">
+                                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-neutral-900 px-2">
+                                        <Plane className="h-4 w-4 text-red-600 rotate-90" />
+                                      </div>
+                                    </div>
+                                    <p className="text-xs text-red-600 font-bold uppercase">{flight.stops || "Non-stop"}</p>
+                                  </div>
+  
+                                <div className="text-center md:text-right">
+                                  <p className="text-2xl font-bold">{formatTime(flight.arrival_time)}</p>
+                                  <p className="text-sm text-neutral-500">{flight.destination}</p>
+                                </div>
                               </div>
-                            </div>
 
                             <div className="flex items-center justify-between md:flex-col md:items-end md:gap-2">
                               <div className="md:text-right">

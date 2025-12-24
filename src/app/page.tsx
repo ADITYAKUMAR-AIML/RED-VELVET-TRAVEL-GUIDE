@@ -25,7 +25,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { FEATURED_HOTELS, FEATURED_PACKAGES, FEATURED_DESTINATIONS } from "@/lib/data";
+import { SplashScreen } from "@/components/SplashScreen";
 
 const VIDEO_URL = "https://videos.pexels.com/video-files/3571264/3571264-uhd_2560_1440_30fps.mp4";
 const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1506929562872-bb421553b3f1?auto=format&fit=crop&q=80";
@@ -85,11 +85,13 @@ export default function HomePage() {
   const { t } = useLanguage();
   const { user, loading: authLoading, initialized } = useAuth();
   const contentRef = useRef<HTMLDivElement>(null);
+  const tracingRef = useRef<HTMLDivElement>(null);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [mounted, setMounted] = useState(false);
   const [videoError, setVideoError] = useState(false);
+  const [showSplash, setShowSplash] = useState(true);
 
   // Database states
   const [featuredDestinations, setFeaturedDestinations] = useState<any[]>([]);
@@ -117,6 +119,12 @@ export default function HomePage() {
     };
 
     fetchFeatured();
+
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -133,11 +141,14 @@ export default function HomePage() {
   if (!mounted || !initialized) return null;
 
   return (
-    <div className="min-h-screen bg-white dark:bg-neutral-950">
+    <div ref={contentRef} className="min-h-screen bg-white dark:bg-neutral-950 relative">
+      <AnimatePresence>
+        {showSplash && <SplashScreen />}
+      </AnimatePresence>
       <Navbar key={user?.id || 'guest'} />
 
       <main>
-        <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-black pt-20">
+        <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-black pt-20 lg:pl-16">
           <div className="absolute inset-0 z-0">
             <div className="absolute inset-0 bg-black/50 z-10" />
             {!videoError ? (
@@ -240,9 +251,9 @@ export default function HomePage() {
           </div>
         </section>
 
-        <div ref={contentRef} className="relative">
-          <ScrollTracingLine contentRef={contentRef} />
-
+        <div ref={tracingRef} className="relative">
+          <ScrollTracingLine contentRef={tracingRef} />
+          
           <section className="py-24 bg-neutral-50 dark:bg-neutral-900 lg:pl-16">
             <div className="container mx-auto px-6">
               <div className="flex flex-col md:flex-row items-end justify-between mb-16 gap-6 text-left">
@@ -338,7 +349,7 @@ export default function HomePage() {
               </div>
 
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-6">
-                {(featuredDestinations.length > 0 ? featuredDestinations : FEATURED_DESTINATIONS.slice(0, 12)).map((item, idx) => (
+                {featuredDestinations.slice(0, 12).map((item, idx) => (
                   <motion.div
                     key={item.id}
                     initial={{ opacity: 0, y: 15 }}
@@ -360,7 +371,6 @@ export default function HomePage() {
                             className="absolute top-1.5 right-1.5 shadow-sm scale-75 sm:scale-90" 
                             size="sm" 
                           />
-
                         </div>
                         <div className="space-y-0">
                           <h3 className="font-bold text-neutral-900 dark:text-neutral-50 text-[11px] sm:text-xs line-clamp-1 group-hover:text-red-600 transition-colors">
@@ -394,7 +404,7 @@ export default function HomePage() {
               </div>
 
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-6">
-                {(featuredPackages.length > 0 ? featuredPackages : FEATURED_PACKAGES.slice(0, 12)).map((pkg, idx) => (
+                {featuredPackages.slice(0, 12).map((pkg, idx) => (
                   <motion.div
                     key={pkg.id}
                     initial={{ opacity: 0, y: 15 }}
@@ -453,7 +463,7 @@ export default function HomePage() {
               </div>
 
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-6">
-                {(featuredHotels.length > 0 ? featuredHotels : FEATURED_HOTELS.slice(0, 12)).map((hotel, idx) => (
+                {featuredHotels.slice(0, 12).map((hotel, idx) => (
                   <motion.div
                     key={hotel.id}
                     initial={{ opacity: 0, y: 15 }}
@@ -508,6 +518,7 @@ export default function HomePage() {
             location="Mumbai"
             type="hotel"
             href="/hotels?location=Mumbai"
+            className="lg:pl-16"
           />
 
           <LocationSection 
@@ -516,6 +527,7 @@ export default function HomePage() {
             location="Rajasthan"
             type="hotel"
             href="/hotels?location=Rajasthan"
+            className="lg:pl-16"
           />
 
           <LocationSection 
@@ -524,6 +536,7 @@ export default function HomePage() {
             location="Bengaluru"
             type="destination"
             href="/destinations?location=Bengaluru"
+            className="lg:pl-16"
           />
 
           <LocationSection 
@@ -532,6 +545,7 @@ export default function HomePage() {
             location="Goa"
             type="package"
             href="/packages?location=Goa"
+            className="lg:pl-16"
           />
 
           <LocationSection 
@@ -540,6 +554,7 @@ export default function HomePage() {
             location="Kerala"
             type="package"
             href="/packages?location=Kerala"
+            className="lg:pl-16"
           />
 
           <section className="py-24 bg-white dark:bg-neutral-950 lg:pl-16">
@@ -569,46 +584,46 @@ export default function HomePage() {
               </div>
             </div>
           </section>
+
+          <footer className="bg-neutral-900 text-white py-24 lg:pl-16">
+            <div className="container mx-auto px-6">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-12 text-left">
+                <div className="col-span-1 md:col-span-2">
+                  <Link href="/" className="text-3xl font-black tracking-tighter text-red-500 mb-8 block">
+                    ORCHIDS<span className="text-white">TRAVEL</span>
+                  </Link>
+                  <p className="text-neutral-400 max-w-sm mb-8">
+                    {t('footerDesc')}
+                  </p>
+                </div>
+                <div>
+                  <h4 className="font-bold mb-6 text-white">{t('exploreFooter')}</h4>
+                  <ul className="space-y-4 text-neutral-400">
+                    <li><Link href="/destinations" className="hover:text-red-500 transition-colors">{t('destinations')}</Link></li>
+                    <li><Link href="/hotels" className="hover:text-red-500 transition-colors">{t('hotels')}</Link></li>
+                    <li><Link href="/packages" className="hover:text-red-500 transition-colors">{t('packages')}</Link></li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-bold mb-6 text-white">{t('contactFooter')}</h4>
+                  <ul className="space-y-4 text-neutral-400">
+                    <li><Link href="/contact-agent" className="hover:text-red-500 transition-colors">{t('contactAgent')}</Link></li>
+                    <li>kumaradityasrm@gmail.com</li>
+                    <li>+1 (555) 000-0000</li>
+                  </ul>
+                </div>
+              </div>
+              <div className="mt-24 pt-8 border-t border-neutral-800 text-neutral-500 text-sm flex flex-col md:flex-row justify-between items-center gap-4">
+                <p>© 2024 Orchids Travel. {t('allRightsReserved')}</p>
+                <div className="flex gap-8">
+                  <span className="hover:text-neutral-300 cursor-pointer">{t('privacyPolicy')}</span>
+                  <span className="hover:text-neutral-300 cursor-pointer">{t('termsOfService')}</span>
+                </div>
+              </div>
+            </div>
+          </footer>
         </div>
       </main>
-
-      <footer className="bg-neutral-900 text-white py-24">
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 text-left">
-            <div className="col-span-1 md:col-span-2">
-              <Link href="/" className="text-3xl font-black tracking-tighter text-red-500 mb-8 block">
-                ORCHIDS<span className="text-white">TRAVEL</span>
-              </Link>
-              <p className="text-neutral-400 max-w-sm mb-8">
-                {t('footerDesc')}
-              </p>
-            </div>
-            <div>
-              <h4 className="font-bold mb-6 text-white">{t('exploreFooter')}</h4>
-              <ul className="space-y-4 text-neutral-400">
-                <li><Link href="/destinations" className="hover:text-red-500 transition-colors">{t('destinations')}</Link></li>
-                <li><Link href="/hotels" className="hover:text-red-500 transition-colors">{t('hotels')}</Link></li>
-                <li><Link href="/packages" className="hover:text-red-500 transition-colors">{t('packages')}</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold mb-6 text-white">{t('contactFooter')}</h4>
-              <ul className="space-y-4 text-neutral-400">
-                <li><Link href="/contact-agent" className="hover:text-red-500 transition-colors">{t('contactAgent')}</Link></li>
-                <li>kumaradityasrm@gmail.com</li>
-                <li>+1 (555) 000-0000</li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-24 pt-8 border-t border-neutral-800 text-neutral-500 text-sm flex flex-col md:flex-row justify-between items-center gap-4">
-            <p>© 2024 Orchids Travel. {t('allRightsReserved')}</p>
-            <div className="flex gap-8">
-              <span className="hover:text-neutral-300 cursor-pointer">{t('privacyPolicy')}</span>
-              <span className="hover:text-neutral-300 cursor-pointer">{t('termsOfService')}</span>
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

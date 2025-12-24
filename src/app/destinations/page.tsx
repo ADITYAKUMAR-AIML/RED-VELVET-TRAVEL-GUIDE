@@ -16,7 +16,6 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/context/LanguageContext";
-import { FEATURED_DESTINATIONS } from "@/lib/data";
 import {
   Pagination,
   PaginationContent,
@@ -36,9 +35,14 @@ function DestinationsContent() {
   const [activeTag, setActiveTag] = React.useState("All");
   const [mounted, setMounted] = React.useState(false);
   const [currentPage, setCurrentPage] = React.useState(1);
+  const [destinations, setDestinations] = React.useState<any[]>([]);
   
   React.useEffect(() => {
     setMounted(true);
+    fetch("/api/admin/data?table=destinations")
+      .then(res => res.json())
+      .then(data => setDestinations(data))
+      .catch(err => console.error("Error fetching destinations:", err));
   }, []);
 
   React.useEffect(() => {
@@ -46,11 +50,11 @@ function DestinationsContent() {
   }, [searchQuery, activeTag]);
 
   const allTags = React.useMemo(() => {
-    const tags = new Set(FEATURED_DESTINATIONS.map(d => d.tag));
+    const tags = new Set(destinations.map(d => d.tag).filter(Boolean));
     return ["All", ...Array.from(tags).sort()];
-  }, []);
+  }, [destinations]);
   
-  const filteredDestinations = FEATURED_DESTINATIONS.filter(d => {
+  const filteredDestinations = destinations.filter(d => {
     const matchesSearch = d.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          d.country.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesTag = activeTag === "All" || d.tag === activeTag;
@@ -140,13 +144,13 @@ function DestinationsContent() {
                 >
                     <Link href={`/destinations/${item.id}`}>
                       <Card className="group h-full max-w-[350px] mx-auto overflow-hidden border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm transition-all hover:shadow-xl">
-                        <div className="h-48 relative overflow-hidden">
-                          <Image 
-                            src={item.image} 
-                            alt={item.title} 
-                            fill 
-                            className="object-cover transition-transform duration-500 group-hover:scale-110" 
-                          />
+                          <div className="h-48 relative overflow-hidden">
+                            <Image 
+                              src={item.image_url || item.image} 
+                              alt={item.title} 
+                              fill 
+                              className="object-cover transition-transform duration-500 group-hover:scale-110" 
+                            />
                           <LikeButton 
                             itemType="destination" 
                             itemId={item.id} 
