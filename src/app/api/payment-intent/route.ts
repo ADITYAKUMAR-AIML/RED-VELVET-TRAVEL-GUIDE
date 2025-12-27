@@ -47,19 +47,26 @@ export async function POST(request: NextRequest) {
 
     let basePrice = ITEM_PRICES[itemType]?.[itemId];
 
-    if (!basePrice) {
-      // Fetch from Supabase if not in hardcoded list
-      const table = itemType === 'hotel' ? 'hotels' : itemType === 'package' ? 'packages' : 'destinations';
-      const { data, error } = await supabase
-        .from(table)
-        .select('price')
-        .eq('id', itemId)
-        .single();
+      if (!basePrice) {
+        // Fetch from Supabase if not in hardcoded list
+        const tableMap: Record<string, string> = {
+          hotel: 'hotels',
+          package: 'packages',
+          destination: 'destinations',
+          flight: 'flights'
+        };
+        const table = tableMap[itemType] || 'destinations';
+        
+        const { data, error } = await supabase
+          .from(table)
+          .select('price')
+          .eq('id', itemId)
+          .single();
 
-      if (data && !error) {
-        basePrice = parsePriceToCents(data.price);
+        if (data && !error) {
+          basePrice = parsePriceToCents(data.price);
+        }
       }
-    }
 
     if (!basePrice) {
       // Fallback for demo if still not found

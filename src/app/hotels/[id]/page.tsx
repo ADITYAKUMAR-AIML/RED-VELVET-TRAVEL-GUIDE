@@ -23,6 +23,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/context/LanguageContext";
 import { ReviewSection } from "@/components/ReviewSection";
 import { supabase } from "@/lib/supabase";
+import { LeafletMap } from "@/components/LeafletMap";
 
 const RED_VELVET_GRADIENT = "bg-gradient-to-r from-[#8a0000] via-[#c00000] to-[#8a0000]";
 
@@ -151,7 +152,18 @@ export default function HotelDetailsPage() {
                 </div>
               </section>
 
-              <ReviewSection itemId={hotel.id.toString()} itemType="hotel" />
+                <section className="mb-12">
+                  <h2 className="mb-6 text-3xl font-bold">Location</h2>
+                  <LeafletMap 
+                      lat={hotel.latitude} 
+                      lng={hotel.longitude} 
+                      name={hotel.name}
+                      image={hotel.image}
+                      location={hotel.location}
+                    />
+                </section>
+
+                <ReviewSection itemId={hotel.id.toString()} itemType="hotel" />
             </div>
 
             <div className="lg:col-span-1">

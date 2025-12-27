@@ -25,6 +25,8 @@ import { useLanguage } from "@/context/LanguageContext";
 import { ReviewSection } from "@/components/ReviewSection";
 import { supabase } from "@/lib/supabase";
 
+import { LeafletMap } from "@/components/LeafletMap";
+
 const RED_VELVET_GRADIENT = "bg-gradient-to-r from-[#8a0000] via-[#c00000] to-[#8a0000]";
 
 export default function DestinationDetailsPage() {
@@ -153,7 +155,18 @@ export default function DestinationDetailsPage() {
                 </div>
               </section>
 
-              <ReviewSection itemId={destination.id} itemType="destination" />
+                <section className="mb-12">
+                  <h2 className="mb-6 text-3xl font-bold">Location</h2>
+                  <LeafletMap 
+                      lat={destination.latitude} 
+                      lng={destination.longitude} 
+                      name={destination.title}
+                      image={destination.image}
+                      location={destination.location}
+                    />
+                </section>
+
+                <ReviewSection itemId={destination.id} itemType="destination" />
             </div>
 
             <div className="lg:col-span-1">

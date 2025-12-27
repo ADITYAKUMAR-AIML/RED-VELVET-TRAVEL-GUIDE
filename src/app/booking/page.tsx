@@ -171,35 +171,45 @@ function BookingContent() {
   const [item, setItem] = React.useState<{ name: string; location: string; price: number; image: string } | null>(null);
 
   const itemId = searchParams.get("id") || "santorini";
-  const itemType = (searchParams.get("type") || "destination") as "hotel" | "package" | "destination";
+  const itemType = (searchParams.get("type") || "destination") as "hotel" | "package" | "destination" | "flight";
 
   React.useEffect(() => {
     setMounted(true);
     
     // Check hardcoded list first
-    const hardcodedItem = ITEMS[itemType]?.[itemId];
+    const hardcodedItem = ITEMS[itemType as keyof typeof ITEMS]?.[itemId];
     if (hardcodedItem) {
       setItem(hardcodedItem);
     } else {
       // Fetch from Supabase
       const fetchItem = async () => {
         try {
-          const table = itemType === 'hotel' ? 'hotels' : itemType === 'package' ? 'packages' : 'destinations';
-          const nameField = itemType === 'hotel' ? 'name' : 'title';
-          const { data, error } = await supabase
-            .from(table)
-            .select(`${nameField}, price, location, image_url`)
-            .eq('id', itemId)
-            .single();
-
-          if (data && !error) {
-            setItem({
-              name: data[nameField],
-              location: data.location || '',
-              price: parseInt(data.price.replace(/[^0-9]/g, '')) || 100,
-              image: data.image_url || 'https://images.unsplash.com/photo-1506929562872-bb421553b3f1?auto=format&fit=crop&q=80',
-            });
-          } else {
+          const tableMap: Record<string, string> = {
+            hotel: 'hotels',
+            package: 'packages',
+            destination: 'destinations',
+            flight: 'flights'
+          };
+          
+          const table = tableMap[itemType] || 'destinations';
+          const nameField = (itemType === 'hotel' || itemType === 'flight') ? 'airline' : 'title';
+          // Correction: For hotel it's 'name', for flight it's 'airline'.
+          const actualNameField = itemType === 'hotel' ? 'name' : itemType === 'flight' ? 'airline' : 'title';
+          
+            const { data, error } = await supabase
+              .from(table)
+              .select(`*`)
+              .eq('id', itemId)
+              .single();
+  
+            if (data && !error) {
+              setItem({
+                name: itemType === 'flight' ? `${data.airline} (${data.origin} → ${data.destination})` : (data.title || data.name || ''),
+                location: itemType === 'flight' ? `${data.origin} to ${data.destination}` : data.location || '',
+                price: parseInt(data.price.toString().replace(/[^0-9]/g, '')) || 100,
+                image: data.image_url || 'https://images.unsplash.com/photo-1436491865332-7a61a109c0f2?auto=format&fit=crop&q=80',
+              });
+            } else {
             // Final fallback
             setItem(ITEMS.destination.santorini);
           }
@@ -251,21 +261,22 @@ function BookingContent() {
     }
   };
 
-  const handlePaymentSuccess = async () => {
-    try {
-      const itemIdColumn = itemType === 'hotel' ? 'hotel_id' : 
-                           itemType === 'package' ? 'package_id' : 'destination_id';
-
-      const { data, error } = await supabase.from('bookings').insert({
-        user_id: user?.id,
-        [itemIdColumn]: itemId,
-        item_type: itemType,
-        travelers,
-        dates,
-        total_price: (amount / 100).toString(),
-        status: 'confirmed',
-        payment_intent_id: paymentIntentId,
-      }).select().single();
+    const handlePaymentSuccess = async () => {
+      try {
+        const itemIdColumn = itemType === 'hotel' ? 'hotel_id' : 
+                             itemType === 'package' ? 'package_id' : 
+                             itemType === 'flight' ? 'flight_id' : 'destination_id';
+  
+        const { data, error } = await supabase.from('bookings').insert({
+          user_id: user?.id,
+          [itemIdColumn]: itemId,
+          item_type: itemType,
+          travelers,
+          dates,
+          total_price: (amount / 100).toString(),
+          status: 'confirmed',
+          payment_intent_id: paymentIntentId,
+        }).select().single();
 
       if (error) throw error;
       setBookingId(data?.id);
@@ -283,7 +294,11 @@ function BookingContent() {
     }
   };
 
-  if (!mounted || authLoading) return null;
+  if (!mounted || authLoading || !item) return (
+    <div className="flex min-h-screen items-center justify-center bg-white dark:bg-neutral-950">
+      <Loader2 className="h-8 w-8 animate-spin text-red-600" />
+    </div>
+  );
 
   return (
     <div className="flex min-h-screen flex-col bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50 transition-colors duration-300">

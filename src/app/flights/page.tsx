@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { Plane, PlaneTakeoff, PlaneLanding, Calendar, Users, Search, Filter, Clock, ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { Plane, PlaneTakeoff, PlaneLanding, Calendar, Users, Search, Filter, Clock, ArrowRight, ArrowLeftRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { Navbar } from "@/components/Navbar";
@@ -10,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/context/LanguageContext";
+import { LocationAutocomplete } from "@/components/LocationAutocomplete";
 import {
   Pagination,
   PaginationContent,
@@ -48,6 +50,13 @@ export default function FlightsPage() {
       setCurrentPage(1);
     }, [fromQuery, toQuery, activeClass]);
   
+    const [isSearching, setIsSearching] = React.useState(false);
+
+    const handleSearch = () => {
+      setIsSearching(true);
+      setTimeout(() => setIsSearching(false), 800);
+    };
+
     const filteredFlights = flights.filter(flight => {
       const from = flight.origin || "";
       const to = flight.destination || "";
@@ -57,27 +66,27 @@ export default function FlightsPage() {
       return matchesFrom && matchesTo && matchesClass;
     });
 
-    const formatTime = (dateStr: string) => {
-      if (!dateStr) return "--:--";
-      try {
-        const date = new Date(dateStr);
-        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      } catch (e) {
-        return "--:--";
-      }
-    };
-
-    const totalPages = Math.ceil(filteredFlights.length / ITEMS_PER_PAGE);
     const paginatedFlights = filteredFlights.slice(
       (currentPage - 1) * ITEMS_PER_PAGE,
       currentPage * ITEMS_PER_PAGE
     );
 
+    const totalPages = Math.ceil(filteredFlights.length / ITEMS_PER_PAGE);
+
+
   if (!mounted) return null;
 
-  const flightClasses = ["All", "Economy", "Premium Economy", "Business", "First Class"];
-
-  return (
+    const flightClasses = ["All", "Economy", "Premium Economy", "Business", "First Class"];
+  
+    const formatTime = (time: string) => {
+      if (!time) return "12:00";
+      if (time.includes("T")) {
+        return new Date(time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+      }
+      return time;
+    };
+  
+    return (
     <div className="flex min-h-screen flex-col bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50 transition-colors duration-300">
       <Navbar />
 
@@ -90,38 +99,65 @@ export default function FlightsPage() {
             </p>
           </div>
 
-          <Card className="mb-12 overflow-hidden border-none bg-neutral-50 dark:bg-neutral-900 shadow-inner">
-            <CardContent className="p-8">
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-4 lg:grid-cols-4">
-                <div className="relative">
-                  <PlaneTakeoff className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-red-600" />
-                  <Input 
-                    placeholder="From (e.g. London)" 
-                    className="pl-12 py-6 rounded-xl border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950"
-                    value={fromQuery}
-                    onChange={(e) => setFromQuery(e.target.value)}
-                  />
+            <Card className="mb-12 overflow-hidden border-none bg-neutral-50 dark:bg-neutral-900 shadow-inner">
+              <CardContent className="p-8">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-12 lg:grid-cols-12 items-center">
+                  <div className="md:col-span-4 relative">
+                    <LocationAutocomplete 
+                      placeholder="From (e.g. London)" 
+                      value={fromQuery}
+                      onChange={setFromQuery}
+                      icon={<PlaneTakeoff className="h-5 w-5 text-red-600" />}
+                    />
+                  </div>
+                  
+                  <div className="md:col-span-1 flex justify-center">
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      className="rounded-full hover:bg-red-50 dark:hover:bg-red-950/30 text-red-600 transition-transform hover:rotate-180"
+                      onClick={() => {
+                        const temp = fromQuery;
+                        setFromQuery(toQuery);
+                        setToQuery(temp);
+                      }}
+                    >
+                      <ArrowLeftRight className="h-5 w-5" />
+                    </Button>
+                  </div>
+
+                  <div className="md:col-span-4 relative">
+                    <LocationAutocomplete 
+                      placeholder="To (e.g. Santorini)" 
+                      value={toQuery}
+                      onChange={setToQuery}
+                      icon={<PlaneLanding className="h-5 w-5 text-red-600" />}
+                    />
+                  </div>
+
+                    <div className="md:col-span-3">
+                      <Button 
+                        disabled={isSearching}
+                        onClick={handleSearch}
+                        className={`${RED_VELVET_GRADIENT} w-full rounded-xl py-6 text-white text-lg font-bold shadow-lg shadow-red-600/20 hover:shadow-red-600/40 transition-all`}
+                      >
+                        {isSearching ? (
+                          <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                          >
+                            <Search className="h-5 w-5" />
+                          </motion.div>
+                        ) : (
+                          <>
+                            <Search className="mr-2 h-5 w-5" /> {t('search')}
+                          </>
+                        )}
+                      </Button>
+                    </div>
+
                 </div>
-                <div className="relative">
-                  <PlaneLanding className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-red-600" />
-                  <Input 
-                    placeholder="To (e.g. Santorini)" 
-                    className="pl-12 py-6 rounded-xl border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950"
-                    value={toQuery}
-                    onChange={(e) => setToQuery(e.target.value)}
-                  />
-                </div>
-                <div className="relative">
-                  <Calendar className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400" />
-                  <Input 
-                    type="date"
-                    className="pl-12 py-6 rounded-xl border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950"
-                  />
-                </div>
-                <Button className={`${RED_VELVET_GRADIENT} h-full rounded-xl py-6 text-white text-lg font-bold`}>
-                  <Search className="mr-2 h-5 w-5" /> {t('search')}
-                </Button>
-              </div>
+
 
               <div className="mt-8 flex flex-wrap items-center gap-4">
                 <span className="text-sm font-medium text-neutral-500">{t('popularCategories')}:</span>
@@ -154,55 +190,63 @@ export default function FlightsPage() {
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <Card className="overflow-hidden border-none bg-white dark:bg-neutral-900 shadow-sm hover:shadow-md transition-shadow">
-                      <CardContent className="p-0">
-                        <div className="flex flex-col md:flex-row md:items-center">
-                          <div className="p-8 md:w-1/4 flex flex-col items-center border-b md:border-b-0 md:border-r border-neutral-100 dark:border-neutral-800">
-                            <div className="mb-2 h-12 w-12 overflow-hidden rounded-full bg-neutral-100 p-2">
-                               <Plane className="h-full w-full text-red-600" />
+                    <Link href={`/flights/${flight.id}`}>
+                      <Card className="overflow-hidden border-none bg-white dark:bg-neutral-900 shadow-sm hover:shadow-md transition-all hover:scale-[1.01] group cursor-pointer">
+                        <CardContent className="p-0">
+                          <div className="flex flex-col md:flex-row md:items-center">
+                            <div className="p-8 md:w-1/4 flex flex-col items-center border-b md:border-b-0 md:border-r border-neutral-100 dark:border-neutral-800">
+                              <div className="mb-2 h-12 w-12 overflow-hidden rounded-full bg-neutral-100 p-2 group-hover:bg-red-50 transition-colors">
+                                 <Plane className="h-full w-full text-red-600" />
+                              </div>
+                              <p className="font-bold text-neutral-900 dark:text-neutral-50">{flight.airline}</p>
+                              <Badge variant="outline" className="mt-2 border-red-200 dark:border-red-900 text-red-700 dark:text-red-400">
+                                {flight.class}
+                              </Badge>
                             </div>
-                            <p className="font-bold text-neutral-900 dark:text-neutral-50">{flight.airline}</p>
-                            <Badge variant="outline" className="mt-2 border-red-200 dark:border-red-900 text-red-700 dark:text-red-400">
-                              {flight.class}
-                            </Badge>
-                          </div>
 
-                            <div className="flex flex-1 flex-col p-8 md:flex-row md:items-center md:justify-between gap-8">
-                              <div className="flex flex-1 items-center justify-between md:justify-start md:gap-12">
-                                <div className="text-center md:text-left">
-                                  <p className="text-2xl font-bold">{formatTime(flight.departure_time)}</p>
-                                  <p className="text-sm text-neutral-500">{flight.origin}</p>
-                                </div>
-                                
-                                <div className="flex flex-col items-center gap-1 flex-1 max-w-[150px]">
-                                    <p className="text-xs text-neutral-400 font-medium">{flight.duration || "Direct"}</p>
-                                    <div className="relative w-full h-[2px] bg-neutral-200 dark:bg-neutral-700">
-                                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-neutral-900 px-2">
-                                        <Plane className="h-4 w-4 text-red-600 rotate-90" />
-                                      </div>
-                                    </div>
-                                    <p className="text-xs text-red-600 font-bold uppercase">{flight.stops || "Non-stop"}</p>
+                              <div className="flex flex-1 flex-col p-8 md:flex-row md:items-center md:justify-between gap-8">
+                                <div className="flex flex-1 items-center justify-between md:justify-start md:gap-12">
+                                  <div className="text-center md:text-left">
+                                    <p className="text-2xl font-bold">{formatTime(flight.departure_time)}</p>
+                                    <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">{flight.origin}</p>
                                   </div>
-  
-                                <div className="text-center md:text-right">
-                                  <p className="text-2xl font-bold">{formatTime(flight.arrival_time)}</p>
-                                  <p className="text-sm text-neutral-500">{flight.destination}</p>
+                                  
+                                  <div className="flex flex-col items-center gap-1 flex-1 max-w-[150px]">
+                                      <p className="text-xs text-neutral-400 font-medium">{flight.duration || "Direct"}</p>
+                                      <div className="relative w-full h-[2px] bg-neutral-200 dark:bg-neutral-700">
+                                          <motion.div 
+                                            initial={{ left: 0 }}
+                                            animate={{ left: "50%" }}
+                                            transition={{ duration: 1.5, ease: "linear" }}
+                                            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-20"
+                                          >
+                                            <Plane className="h-3 w-3 text-red-600 rotate-90" />
+                                          </motion.div>
+                                      </div>
+                                      <p className="text-xs text-red-600 font-bold uppercase">{flight.stops || "Non-stop"}</p>
+                                    </div>
+    
+                                  <div className="text-center md:text-right">
+                                    <p className="text-2xl font-bold">{formatTime(flight.arrival_time)}</p>
+                                    <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">{flight.destination}</p>
+                                  </div>
                                 </div>
-                              </div>
 
-                            <div className="flex items-center justify-between md:flex-col md:items-end md:gap-2">
-                              <div className="md:text-right">
-                                <p className="text-3xl font-bold text-red-900 dark:text-red-500">{flight.price}</p>
-                                <p className="text-xs text-neutral-500">per traveler</p>
+
+                              <div className="flex items-center justify-between md:flex-col md:items-end md:gap-2">
+                                <div className="md:text-right">
+                                  <p className="text-3xl font-bold text-red-900 dark:text-red-500">{flight.price}</p>
+                                  <p className="text-xs text-neutral-500">per traveler</p>
+                                </div>
+                                <Button className={`${RED_VELVET_GRADIENT} rounded-xl px-8 text-white group-hover:shadow-md transition-all`}>
+                                  {t('bookNow')}
+                                </Button>
                               </div>
-                              <Button className={`${RED_VELVET_GRADIENT} rounded-xl px-8 text-white`}>
-                                {t('bookNow')}
-                              </Button>
                             </div>
                           </div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                        </CardContent>
+                      </Card>
+                    </Link>
                   </motion.div>
                 ))}
               </AnimatePresence>

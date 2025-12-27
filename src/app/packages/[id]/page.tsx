@@ -22,6 +22,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/context/LanguageContext";
 import { ReviewSection } from "@/components/ReviewSection";
 import { supabase } from "@/lib/supabase";
+import { LeafletMap } from "@/components/LeafletMap";
 
 const RED_VELVET_GRADIENT = "bg-gradient-to-r from-[#8a0000] via-[#c00000] to-[#8a0000]";
 
@@ -44,10 +45,22 @@ export default function PackageDetailsPage() {
           .single();
         
           if (data) {
+            let features = data.features;
+            if (typeof features === 'string') {
+              try {
+                features = JSON.parse(features);
+              } catch {
+                features = features.split(',').map((f: string) => f.trim());
+              }
+            }
+            if (!Array.isArray(features)) {
+              features = ["Travel Guide", "Transport", "Sightseeing"];
+            }
+
             setPkg({
               ...data,
               image: data.image_url || data.image,
-              features: data.features || ["Travel Guide", "Transport", "Sightseeing"],
+              features: features,
             });
           }
         } catch (err) {
@@ -122,23 +135,34 @@ export default function PackageDetailsPage() {
                 </p>
               </section>
 
-              <section className="mb-12">
-                <h2 className="mb-6 text-3xl font-bold">{t('whatsIncluded') || "What's Included"}</h2>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  {pkg.features.map((feature) => (
-                    <div key={feature} className="flex items-center gap-3 rounded-xl bg-neutral-50 dark:bg-neutral-900 p-4">
-                      <Gift className="h-6 w-6 text-red-600" />
-                      <span className="font-medium">{feature}</span>
+                <section className="mb-12">
+                  <h2 className="mb-6 text-3xl font-bold">{t('whatsIncluded') || "What's Included"}</h2>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {Array.isArray(pkg.features) && pkg.features.map((feature: string) => (
+                      <div key={feature} className="flex items-center gap-3 rounded-xl bg-neutral-50 dark:bg-neutral-900 p-4">
+                        <Gift className="h-6 w-6 text-red-600" />
+                        <span className="font-medium">{feature}</span>
+                      </div>
+                    ))}
+                    <div className="flex items-center gap-3 rounded-xl bg-neutral-50 dark:bg-neutral-900 p-4">
+                      <CheckCircle2 className="h-6 w-6 text-green-500" />
+                      <span className="font-medium">{t('insuranceIncluded') || 'Travel Insurance Included'}</span>
                     </div>
-                  ))}
-                  <div className="flex items-center gap-3 rounded-xl bg-neutral-50 dark:bg-neutral-900 p-4">
-                    <CheckCircle2 className="h-6 w-6 text-green-500" />
-                    <span className="font-medium">{t('insuranceIncluded') || 'Travel Insurance Included'}</span>
                   </div>
-                </div>
-              </section>
+                </section>
 
-              <ReviewSection itemId={pkg.id.toString()} itemType="package" />
+                <section className="mb-12">
+                  <h2 className="mb-6 text-3xl font-bold">Location</h2>
+                  <LeafletMap 
+                      lat={pkg.latitude} 
+                      lng={pkg.longitude} 
+                      name={pkg.title}
+                      image={pkg.image}
+                      location={pkg.destination}
+                    />
+                </section>
+
+                <ReviewSection itemId={pkg.id.toString()} itemType="package" />
             </div>
 
             <div className="lg:col-span-1">

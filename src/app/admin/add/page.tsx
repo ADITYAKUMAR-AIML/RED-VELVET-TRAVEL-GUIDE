@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { 
   ArrowLeft, 
   MapPin, 
@@ -16,7 +16,10 @@ import {
   Star,
   List,
   Clock,
-  Users
+  Users,
+  Globe,
+  Navigation,
+  Compass
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
@@ -33,13 +36,39 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import { LocationAutocomplete } from "@/components/LocationAutocomplete";
 
-export default function AddContentPage() {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [type, setType] = useState("destinations");
-  const [success, setSuccess] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  export default function AddContentPage() {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const initialType = searchParams.get("type") || "destinations";
+    
+    const [loading, setLoading] = useState(false);
+    const [type, setType] = useState(initialType);
+    const [success, setSuccess] = useState(false);
+    const [mounted, setMounted] = useState(false);
+  
+    // Location states for autocomplete
+    const [locations, setLocations] = useState({
+      country: "",
+      location: "",
+      origin: "",
+      destination: "",
+    });
+  
+    const updateLocation = (field: keyof typeof locations, value: string) => {
+      setLocations(prev => ({ ...prev, [field]: value }));
+    };
+
+    useEffect(() => {
+      // Synchronize state with URL if needed, or just clear when type changes
+      setLocations({
+        country: "",
+        location: "",
+        origin: "",
+        destination: "",
+      });
+    }, [type]);
 
   useEffect(() => {
     setMounted(true);
@@ -65,17 +94,17 @@ export default function AddContentPage() {
 
     if (type === "hotels") {
       data.rating = parseInt(rawData.rating as string) || 5;
-      data.amenities = (rawData.amenities as string).split(",").map(s => s.trim());
+      data.amenities = (rawData.amenities as string).split(",").map(s => s.trim()).filter(Boolean);
     }
 
     if (type === "packages") {
-      data.features = (rawData.features as string).split(",").map(s => s.trim());
+      data.features = (rawData.features as string).split(",").map(s => s.trim()).filter(Boolean);
     }
 
     if (type === "destinations") {
       data.details = {
         bestTime: rawData.bestTime,
-        activities: (rawData.activities as string || "").split(",").map(s => s.trim())
+        activities: (rawData.activities as string || "").split(",").map(s => s.trim()).filter(Boolean)
       };
       delete data.bestTime;
       delete data.activities;
@@ -160,14 +189,28 @@ export default function AddContentPage() {
                       <Label className="text-sm font-bold uppercase tracking-wider text-neutral-500">Title</Label>
                       <Input name="title" placeholder="e.g. Magical Maldives" required className="h-14 rounded-xl" />
                     </div>
-                    <div className="space-y-3">
-                      <Label className="text-sm font-bold uppercase tracking-wider text-neutral-500">Country</Label>
-                      <Input name="country" placeholder="e.g. Maldives" required className="h-14 rounded-xl" />
-                    </div>
-                    <div className="space-y-3">
-                      <Label className="text-sm font-bold uppercase tracking-wider text-neutral-500">Location</Label>
-                      <Input name="location" placeholder="e.g. Male Atoll" required className="h-14 rounded-xl" />
-                    </div>
+                      <div className="space-y-3">
+                        <Label className="text-sm font-bold uppercase tracking-wider text-neutral-500">Country</Label>
+                        <LocationAutocomplete 
+                          name="country" 
+                          value={locations.country} 
+                          onChange={(val) => updateLocation("country", val)}
+                          placeholder="Search country..." 
+                          icon={<Globe className="w-5 h-5 text-red-600" />}
+                          required 
+                        />
+                      </div>
+                      <div className="space-y-3">
+                        <Label className="text-sm font-bold uppercase tracking-wider text-neutral-500">Location</Label>
+                        <LocationAutocomplete 
+                          name="location" 
+                          value={locations.location} 
+                          onChange={(val) => updateLocation("location", val)}
+                          placeholder="Search city/region..." 
+                          icon={<MapPin className="w-5 h-5 text-red-600" />}
+                          required 
+                        />
+                      </div>
                     <div className="space-y-3">
                       <Label className="text-sm font-bold uppercase tracking-wider text-neutral-500">Tag</Label>
                       <Input name="tag" placeholder="e.g. Romantic" className="h-14 rounded-xl" />
@@ -190,10 +233,17 @@ export default function AddContentPage() {
                       <Label className="text-sm font-bold uppercase tracking-wider text-neutral-500">Package Title</Label>
                       <Input name="title" placeholder="e.g. Golden Triangle Tour" required className="h-14 rounded-xl" />
                     </div>
-                    <div className="space-y-3">
-                      <Label className="text-sm font-bold uppercase tracking-wider text-neutral-500">Main Destination</Label>
-                      <Input name="destination" placeholder="e.g. North India" required className="h-14 rounded-xl" />
-                    </div>
+                      <div className="space-y-3">
+                        <Label className="text-sm font-bold uppercase tracking-wider text-neutral-500">Main Destination</Label>
+                        <LocationAutocomplete 
+                          name="destination" 
+                          value={locations.destination} 
+                          onChange={(val) => updateLocation("destination", val)}
+                          placeholder="Search destination..." 
+                          icon={<Compass className="w-5 h-5 text-red-600" />}
+                          required 
+                        />
+                      </div>
                     <div className="space-y-3">
                       <Label className="text-sm font-bold uppercase tracking-wider text-neutral-500">Duration</Label>
                       <Input name="duration" placeholder="e.g. 5 Days / 4 Nights" required className="h-14 rounded-xl" />
@@ -216,10 +266,17 @@ export default function AddContentPage() {
                       <Label className="text-sm font-bold uppercase tracking-wider text-neutral-500">Hotel Name</Label>
                       <Input name="name" placeholder="e.g. The Taj Mahal Palace" required className="h-14 rounded-xl" />
                     </div>
-                    <div className="space-y-3">
-                      <Label className="text-sm font-bold uppercase tracking-wider text-neutral-500">Location</Label>
-                      <Input name="location" placeholder="e.g. Mumbai, India" required className="h-14 rounded-xl" />
-                    </div>
+                      <div className="space-y-3">
+                        <Label className="text-sm font-bold uppercase tracking-wider text-neutral-500">Location</Label>
+                        <LocationAutocomplete 
+                          name="location" 
+                          value={locations.location} 
+                          onChange={(val) => updateLocation("location", val)}
+                          placeholder="Search hotel location..." 
+                          icon={<MapPin className="w-5 h-5 text-red-600" />}
+                          required 
+                        />
+                      </div>
                     <div className="space-y-3">
                       <Label className="text-sm font-bold uppercase tracking-wider text-neutral-500">Rating (1-5)</Label>
                       <Input name="rating" type="number" min="1" max="5" defaultValue="5" required className="h-14 rounded-xl" />
@@ -242,14 +299,28 @@ export default function AddContentPage() {
                       <Label className="text-sm font-bold uppercase tracking-wider text-neutral-500">Flight Number</Label>
                       <Input name="flight_number" placeholder="e.g. EK-201" className="h-14 rounded-xl" />
                     </div>
-                    <div className="space-y-3">
-                      <Label className="text-sm font-bold uppercase tracking-wider text-neutral-500">Origin</Label>
-                      <Input name="origin" placeholder="e.g. Dubai (DXB)" required className="h-14 rounded-xl" />
-                    </div>
-                    <div className="space-y-3">
-                      <Label className="text-sm font-bold uppercase tracking-wider text-neutral-500">Destination</Label>
-                      <Input name="destination" placeholder="e.g. New York (JFK)" required className="h-14 rounded-xl" />
-                    </div>
+                      <div className="space-y-3">
+                        <Label className="text-sm font-bold uppercase tracking-wider text-neutral-500">Origin</Label>
+                        <LocationAutocomplete 
+                          name="origin" 
+                          value={locations.origin} 
+                          onChange={(val) => updateLocation("origin", val)}
+                          placeholder="Search origin..." 
+                          icon={<Navigation className="w-5 h-5 text-red-600" />}
+                          required 
+                        />
+                      </div>
+                      <div className="space-y-3">
+                        <Label className="text-sm font-bold uppercase tracking-wider text-neutral-500">Destination</Label>
+                        <LocationAutocomplete 
+                          name="destination" 
+                          value={locations.destination} 
+                          onChange={(val) => updateLocation("destination", val)}
+                          placeholder="Search destination..." 
+                          icon={<MapPin className="w-5 h-5 text-red-600" />}
+                          required 
+                        />
+                      </div>
                     <div className="space-y-3">
                       <Label className="text-sm font-bold uppercase tracking-wider text-neutral-500">Departure Time</Label>
                       <Input name="departure_time" type="datetime-local" required className="h-14 rounded-xl" />

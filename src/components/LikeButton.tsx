@@ -5,20 +5,47 @@ import { Heart } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface LikeButtonProps {
   initialLiked?: boolean;
   onToggle?: (liked: boolean) => void;
   className?: string;
+  itemId?: string | number;
+  itemType?: string;
+  size?: "default" | "sm" | "icon";
 }
 
-export function LikeButton({ initialLiked = false, onToggle, className }: LikeButtonProps) {
+export function LikeButton({ 
+  initialLiked = false, 
+  onToggle, 
+  className,
+  itemId,
+  itemType,
+  size = "icon"
+}: LikeButtonProps) {
   const [liked, setLiked] = useState(initialLiked);
+  const { user } = useAuth();
+  const router = useRouter();
 
-  const handleToggle = () => {
+  const handleToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+
     const newLiked = !liked;
     setLiked(newLiked);
     onToggle?.(newLiked);
+    
+    if (newLiked) {
+      toast.success("Added to favorites");
+    }
   };
 
   return (
